@@ -21,10 +21,11 @@
 * [simpleRL-reason](https://github.com/hkust-nlp/simpleRL-reason)
 * [s1: Simple test-time scaling](https://github.com/simplescaling/s1)
 ## AIInfra
-* 这里主要针对于低成本复现R1的策略
+* 这里主要针对于低成本复现R1的策略,本项目会针对于上述开源项目进行复现，并且具体给出对应的硬件成本估算
+* [Sky-T1: Train your own O1 preview model within $450](https://novasky-ai.github.io/posts/sky-t1/)
 ## 关键论文
-* 《Distilling the Knowledge in a Neural Network》(https://arxiv.org/abs/1503.02531)
-* DeepSeek-R1: Incentivizing Reasoning Capability in LLMs viaReinforcement Learning(https://github.com/deepseek-ai/DeepSeek-R1/blob/main/DeepSeek_R1.pdf)
+* [《Distilling the Knowledge in a Neural Network》](https://arxiv.org/abs/1503.02531)
+* [DeepSeek-R1: Incentivizing Reasoning Capability in LLMs viaReinforcement Learning](https://github.com/deepseek-ai/DeepSeek-R1/blob/main/DeepSeek_R1.pdf)
 * [OpenAI o3-mini](https://openai.com/index/openai-o3-mini/)
 * [Gemini 2.0 Flash Thinking](https://deepmind.google/technologies/gemini/flash-thinking/)
 * [Scaling Laws for Neural Language Models](https://arxiv.org/abs/2001.08361)
