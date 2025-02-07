@@ -1,5 +1,4 @@
 from unsloth import FastLanguageModel, PatchFastRL
-PatchFastRL("GRPO", FastLanguageModel)
 from vllm import SamplingParams
 
 from unsloth import is_bfloat16_supported
@@ -7,10 +6,9 @@ import torch
 import re
 from datasets import load_dataset, Dataset
 from trl import GRPOConfig, GRPOTrainer
+import loguru
 max_seq_length = 512 # Can increase for longer reasoning traces
 lora_rank = 32 # Larger rank = smarter, but slower
-
-model_path = "meta-llama/meta-Llama-3.1-8B-Instruct"
 
 SYSTEM_PROMPT = """
 Respond in the following format:
@@ -31,6 +29,8 @@ XML_COT_FORMAT = """\
 </answer>
 """
 
+
+model_path = "meta-llama/meta-Llama-3.1-8B-Instruct"
 
 def load_model_or_tokenizer():
     model, tokenizer = FastLanguageModel.from_pretrained(
@@ -68,15 +68,30 @@ def extract_hash_answer(text: str) -> str | None:
 
 # uncomment middle messages for 1-shot prompting
 def get_gsm8k_questions(split = "train") -> Dataset:
-    data = load_dataset('openai/gsm8k', 'main')[split] # type: ignore
-    data = data.map(lambda x: { # type: ignore
-        'prompt': [
-            {'role': 'system', 'content': SYSTEM_PROMPT},
-            {'role': 'user', 'content': x['question']}
-        ],
-        'answer': extract_hash_answer(x['answer'])
-    }) # type: ignore
-    return data # type: ignore
+    import pandas as pd
+    data_df = pd.read_parquet("data/gsm8k/train-00000-of-00001.parquet")
+    data_list = [data.to_dict() for index,data in data_df.iterrows()]
+    datasets_list = []
+    for data in data_list:
+        data_dict = {
+            'prompt': [
+                {'role': 'system', 'content': SYSTEM_PROMPT},
+                {'role': 'user', 'content': data['question']}
+            ],
+            'answer': extract_hash_answer(data['answer'])
+            
+        }
+        datasets_list.append(data_dict)
+    df = pd.DataFrame(datasets_list)
+    dataset = Dataset.from_pandas(df)
+    # data = data_df.map(lambda x: { # type: ignore
+    #     'prompt': [
+    #         {'role': 'system', 'content': SYSTEM_PROMPT},
+    #         {'role': 'user', 'content': x['question']}
+    #     ],
+    #     'answer': extract_hash_answer(x['answer'])
+    # }) # type: ignore
+    return dataset # type: ignore
 
 dataset = get_gsm8k_questions()
 
@@ -149,7 +164,6 @@ training_args = GRPOConfig(
     report_to = "none", # Can use Weights & Biases
     output_dir = "outputs",
 )
-
 def train():
     model,tokenizer = load_model_or_tokenizer()
 
@@ -185,5 +199,9 @@ def inference():
         lora_request = model.load_lora("grpo_saved_lora"),
     )[0].outputs[0].text
     print(output)
+    
+if __name__ == "__main__":
+    loguru.logger.info("reasoning starting...")
+    train()
 
     
