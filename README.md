@@ -1,8 +1,8 @@
 # uReasoningLLMs
 * Deepseek-r1复现科普与资源汇总,目前复现主要针对于R1蒸馏模型（领域模型或者自有SFT模型）和R1-Zero的复现（观测"顿悟"情况）
 ## 科普
-* 图解Deepseek-r1
-* 可视化指导推理模型
+* [图解Deepseek-r1](https://zhuanlan.zhihu.com/p/22070707889)
+* [可视化指导推理模型](https://zhuanlan.zhihu.com/p/22193737362)
 * 深度理解推理模型
 * Deepseek开源砸了多少人"饭碗"
 * Deepseek技术创新真的是"国运创新"？
