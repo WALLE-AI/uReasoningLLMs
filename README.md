@@ -7,12 +7,21 @@
 * Deepseek开源砸了多少人"饭碗"
 * Deepseek技术创新真的是"国运创新"？
 ## 数据集构建策略
+### 数据合成策略
 * 在Deepseek的技术报告冷启动Long-Cot数据、60W推理数据和20W非推理数据在整个训练过程至关重要，非常有必要在数据集合成与评测上面进行复现研讨，一般业务场景对SFT数据中增强推理能力，比如领域业务场景中合成推理数据集，提高领域模型自身推理能力
 * [rStar-Math](https://github.com/microsoft/rStar)
+### 开源的数据集
+* [Bespoke-Stratos-17k](https://huggingface.co/datasets/bespokelabs/Bespoke-Stratos-17k) 使用Deeepseek-R1对[Sky-T1_data_17k](https://huggingface.co/datasets/NovaSky-AI/Sky-T1_data_17k)进行蒸馏 创建Bespoke-Stratos-17k——一个包含问题、推理轨迹和答案的推理数据集。
+* [NuminaMath-TIR](https://huggingface.co/datasets/AI-MO/NuminaMath-TIR)
+* [Math-Shepherd](https://huggingface.co/datasets/peiyi9979/Math-Shepherd)
+* [QwQ-LongCoT-500K-Cleaned](https://huggingface.co/datasets/qingy2024/QwQ-LongCoT-500K-Cleaned)
 ## 蒸馏策略
 * [Distill Math Reasoning Data from DeepSeek R1 with CAME](https://docs.camel-ai.org/cookbooks/data_generation/distill_math_reasoning_data_from_deepseek_r1.html)
 * [LLMs-Distillation-Quantification](https://github.com/Aegis1863/LLMs-Distillation-Quantification/tree/main)
 ## RL策略
+### 一些RL知识
+* [什么是GRPO Trainer](https://github.com/huggingface/trl/blob/main/docs/source/grpo_trainer.md)
+### 复现进展
 * [Llama3.1_(8B)-GRPO](https://colab.research.google.com/github/unslothai/notebooks/blob/main/nb/Llama3.1_(8B)-GRPO.ipynb#scrollTo=XjjUb0hqE6nm)
 * [Logic-RL](https://github.com/Unakar/Logic-RL)
 * [open-r1](https://github.com/huggingface/open-r1)
