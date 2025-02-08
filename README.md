@@ -15,6 +15,7 @@
 * [NuminaMath-TIR](https://huggingface.co/datasets/AI-MO/NuminaMath-TIR)
 * [Math-Shepherd](https://huggingface.co/datasets/peiyi9979/Math-Shepherd)
 * [QwQ-LongCoT-500K-Cleaned](https://huggingface.co/datasets/qingy2024/QwQ-LongCoT-500K-Cleaned)
+* [trl-lib/tldr](https://huggingface.co/datasets/trl-lib/tldr)
 ## 蒸馏策略
 * [Distill Math Reasoning Data from DeepSeek R1 with CAME](https://docs.camel-ai.org/cookbooks/data_generation/distill_math_reasoning_data_from_deepseek_r1.html)
 * [LLMs-Distillation-Quantification](https://github.com/Aegis1863/LLMs-Distillation-Quantification/tree/main)
