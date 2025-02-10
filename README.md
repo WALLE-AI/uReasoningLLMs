@@ -13,6 +13,10 @@
 ### Datasets Builds
 * 在Deepseek的技术报告冷启动Long-Cot数据、60W推理数据和20W非推理数据在整个训练过程至关重要，非常有必要在数据集合成与评测上面进行复现研讨，一般业务场景对SFT数据中增强推理能力，比如领域业务场景中合成推理数据集，提高领域模型自身推理能力
 * [rStar-Math](https://github.com/microsoft/rStar)
+* [distilabel_r1_distill](https://github.com/huggingface/open-r1/blob/main/src/open_r1/generate.py)
+* [Math-spepherd][https://github.com/argilla-io/distilabel/tree/main/src/distilabel/steps/tasks/math_shepherd]
+* [magpie](https://magpie-align.github.io/)
+* [Camel_ai_cot_agent](https://docs.camel-ai.org/cookbooks/data_generation/self_improving_cot_generation.html)
 ### Opensource Datasets
 * [Bespoke-Stratos-17k](https://huggingface.co/datasets/bespokelabs/Bespoke-Stratos-17k) 使用Deeepseek-R1对[Sky-T1_data_17k](https://huggingface.co/datasets/NovaSky-AI/Sky-T1_data_17k)进行蒸馏 创建Bespoke-Stratos-17k——一个包含问题、推理轨迹和答案的推理数据集。
 * [NuminaMath-TIR](https://huggingface.co/datasets/AI-MO/NuminaMath-TIR)
@@ -36,6 +40,10 @@
 * [oat-zero](https://oatllm.notion.site/oat-zero)
 * [simpleRL-reason](https://github.com/hkust-nlp/simpleRL-reason)
 * [s1: Simple test-time scaling](https://github.com/simplescaling/s1)
+* [RAGEN](https://github.com/ZihanWang314/RAGEN)
+* [R1-V](https://github.com/Deep-Agent/R1-V)
+### Progress of Replication Domain Project
+* [diagnosis_zero](https://github.com/wizardlancet/diagnosis_zero) 在医疗的疾病诊断任务上拿Qwen2.5-1.5B/3B/7B用R1-Zero那种rule based reward尝试复现了一下
 ## AIInfra
 * 这里主要针对于低成本复现R1的策略,本项目会针对于上述开源项目进行复现，并且具体给出对应的硬件成本估算
 * [Sky-T1: Train your own O1 preview model within $450](https://novasky-ai.github.io/posts/sky-t1/)
@@ -48,3 +56,5 @@
 * [Learning to reason with LLMs](https://openai.com/index/learning-to-reason-with-llms/)
 * [Scaling Scaling Laws with Board Games](https://arxiv.org/abs/2104.03113)
 * [Speculations on Test-Time Scaling](https://srush.github.io/awesome-o1/o1-tutorial.pdf)
+## Reference
+* [DeepSeek R1推理相关项目源码分析](https://mp.weixin.qq.com/s/dvy_4uJ5og9IS6J8mPKIQQ)
