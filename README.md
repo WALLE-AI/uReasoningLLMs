@@ -6,6 +6,9 @@
 * [深度理解推理模型](https://zhuanlan.zhihu.com/p/22660720550)
 * Deepseek开源砸了多少人"饭碗"
 * Deepseek技术创新真的是"国运创新"？
+## Prompt
+* [Deepseek官方Prompt](https://api-docs.deepseek.com/zh-cn/prompt-library)
+* [DeepSeek从入门到精通(20250204)](docs/DeepSeek从入门到精通(20250204).pdf)
 ## Datasets
 ### Datasets Builds
 * 在Deepseek的技术报告冷启动Long-Cot数据、60W推理数据和20W非推理数据在整个训练过程至关重要，非常有必要在数据集合成与评测上面进行复现研讨，一般业务场景对SFT数据中增强推理能力，比如领域业务场景中合成推理数据集，提高领域模型自身推理能力
