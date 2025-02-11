@@ -25,6 +25,7 @@
 * [QwQ-LongCoT-500K-Cleaned](https://huggingface.co/datasets/qingy2024/QwQ-LongCoT-500K-Cleaned)
 * [trl-lib/tldr](https://huggingface.co/datasets/trl-lib/tldr)
 * [prm800k](https://huggingface.co/datasets/HuggingFaceH4/prm800k-trl-dedup)
+* [ReasonFlux_SFT_15k](https://huggingface.co/datasets/Gen-Verse/ReasonFlux_SFT_15k)
 ## Distillation
 * [Distill Math Reasoning Data from DeepSeek R1 with CAME](https://docs.camel-ai.org/cookbooks/data_generation/distill_math_reasoning_data_from_deepseek_r1.html)
 * [LLMs-Distillation-Quantification](https://github.com/Aegis1863/LLMs-Distillation-Quantification/tree/main)
@@ -62,5 +63,6 @@
 * [Learning to reason with LLMs](https://openai.com/index/learning-to-reason-with-llms/)
 * [Scaling Scaling Laws with Board Games](https://arxiv.org/abs/2104.03113)
 * [Speculations on Test-Time Scaling](https://srush.github.io/awesome-o1/o1-tutorial.pdf)
+* [Buffer of Thoughts: Thought-Augmented Reasoning with Large Language Models](https://github.com/YangLing0818/buffer-of-thought-llm/tree/main)
 ## Reference
 * [DeepSeek R1推理相关项目源码分析](https://mp.weixin.qq.com/s/dvy_4uJ5og9IS6J8mPKIQQ)
