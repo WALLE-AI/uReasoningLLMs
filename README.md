@@ -19,6 +19,7 @@
 * [Camel_ai_cot_agent](https://docs.camel-ai.org/cookbooks/data_generation/self_improving_cot_generation.html)
 ### Opensource Datasets
 * [Bespoke-Stratos-17k](https://huggingface.co/datasets/bespokelabs/Bespoke-Stratos-17k) 使用Deeepseek-R1对[Sky-T1_data_17k](https://huggingface.co/datasets/NovaSky-AI/Sky-T1_data_17k)进行蒸馏 创建Bespoke-Stratos-17k——一个包含问题、推理轨迹和答案的推理数据集。
+* [Countdown-Tasks-3to4](https://huggingface.co/datasets/Jiayi-Pan/Countdown-Tasks-3to4)
 * [NuminaMath-TIR](https://huggingface.co/datasets/AI-MO/NuminaMath-TIR)
 * [Math-Shepherd](https://huggingface.co/datasets/peiyi9979/Math-Shepherd)
 * [QwQ-LongCoT-500K-Cleaned](https://huggingface.co/datasets/qingy2024/QwQ-LongCoT-500K-Cleaned)
@@ -45,6 +46,8 @@
 * [R1-V](https://github.com/Deep-Agent/R1-V)
 * [Mini-R1: Reproduce Deepseek R1 „aha moment“ a RL tutorial](https://www.philschmid.de/mini-deepseek-r1)
 * [unlock-deepseek](https://github.com/datawhalechina/unlock-deepseek)
+* [DeepScaleR: Surpassing O1-Preview with a 1.5B Model by Scaling RL](https://pretty-radio-b75.notion.site/DeepScaleR-Surpassing-O1-Preview-with-a-1-5B-Model-by-Scaling-RL-19681902c1468005bed8ca303013a4e2)
+* [mini-r1-zero](https://github.com/ahxt/mini-r1-zero)
 ### Progress of Replication Domain Project
 * [diagnosis_zero](https://github.com/wizardlancet/diagnosis_zero) 在医疗的疾病诊断任务上拿Qwen2.5-1.5B/3B/7B用R1-Zero那种rule based reward尝试复现了一下
 ## AIInfra
