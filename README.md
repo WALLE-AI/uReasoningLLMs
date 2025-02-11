@@ -49,6 +49,7 @@
 * [unlock-deepseek](https://github.com/datawhalechina/unlock-deepseek)
 * [DeepScaleR: Surpassing O1-Preview with a 1.5B Model by Scaling RL](https://pretty-radio-b75.notion.site/DeepScaleR-Surpassing-O1-Preview-with-a-1-5B-Model-by-Scaling-RL-19681902c1468005bed8ca303013a4e2)
 * [mini-r1-zero](https://github.com/ahxt/mini-r1-zero)
+* [ReasonFlux](https://github.com/Gen-Verse/ReasonFlux)之开源了SFT阶段训练代码和数据集，RL部分没有开源
 ### Progress of Replication Domain Project
 * [diagnosis_zero](https://github.com/wizardlancet/diagnosis_zero) 在医疗的疾病诊断任务上拿Qwen2.5-1.5B/3B/7B用R1-Zero那种rule based reward尝试复现了一下
 ## AIInfra
@@ -64,5 +65,6 @@
 * [Scaling Scaling Laws with Board Games](https://arxiv.org/abs/2104.03113)
 * [Speculations on Test-Time Scaling](https://srush.github.io/awesome-o1/o1-tutorial.pdf)
 * [Buffer of Thoughts: Thought-Augmented Reasoning with Large Language Models](https://github.com/YangLing0818/buffer-of-thought-llm/tree/main)
+* [Process Reinforcement through Implicit Rewards](https://curvy-check-498.notion.site/Process-Reinforcement-through-Implicit-Rewards-15f4fcb9c42180f1b498cc9b2eaf896f#1604fcb9c42180bbabc6f67a2866d2c3)
 ## Reference
 * [DeepSeek R1推理相关项目源码分析](https://mp.weixin.qq.com/s/dvy_4uJ5og9IS6J8mPKIQQ)
