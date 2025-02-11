@@ -14,7 +14,7 @@
 * 在Deepseek的技术报告冷启动Long-Cot数据、60W推理数据和20W非推理数据在整个训练过程至关重要，非常有必要在数据集合成与评测上面进行复现研讨，一般业务场景对SFT数据中增强推理能力，比如领域业务场景中合成推理数据集，提高领域模型自身推理能力
 * [rStar-Math](https://github.com/microsoft/rStar)
 * [distilabel_r1_distill](https://github.com/huggingface/open-r1/blob/main/src/open_r1/generate.py)
-* [Math-spepherd][https://github.com/argilla-io/distilabel/tree/main/src/distilabel/steps/tasks/math_shepherd]
+* [Math-spepherd](https://github.com/argilla-io/distilabel/tree/main/src/distilabel/steps/tasks/math_shepherd)
 * [magpie](https://magpie-align.github.io/)
 * [Camel_ai_cot_agent](https://docs.camel-ai.org/cookbooks/data_generation/self_improving_cot_generation.html)
 ### Opensource Datasets
@@ -23,6 +23,7 @@
 * [Math-Shepherd](https://huggingface.co/datasets/peiyi9979/Math-Shepherd)
 * [QwQ-LongCoT-500K-Cleaned](https://huggingface.co/datasets/qingy2024/QwQ-LongCoT-500K-Cleaned)
 * [trl-lib/tldr](https://huggingface.co/datasets/trl-lib/tldr)
+* [prm800k](https://huggingface.co/datasets/HuggingFaceH4/prm800k-trl-dedup)
 ## Distillation
 * [Distill Math Reasoning Data from DeepSeek R1 with CAME](https://docs.camel-ai.org/cookbooks/data_generation/distill_math_reasoning_data_from_deepseek_r1.html)
 * [LLMs-Distillation-Quantification](https://github.com/Aegis1863/LLMs-Distillation-Quantification/tree/main)
@@ -42,6 +43,8 @@
 * [s1: Simple test-time scaling](https://github.com/simplescaling/s1)
 * [RAGEN](https://github.com/ZihanWang314/RAGEN)
 * [R1-V](https://github.com/Deep-Agent/R1-V)
+* [Mini-R1: Reproduce Deepseek R1 „aha moment“ a RL tutorial](https://www.philschmid.de/mini-deepseek-r1)
+* [unlock-deepseek](https://github.com/datawhalechina/unlock-deepseek)
 ### Progress of Replication Domain Project
 * [diagnosis_zero](https://github.com/wizardlancet/diagnosis_zero) 在医疗的疾病诊断任务上拿Qwen2.5-1.5B/3B/7B用R1-Zero那种rule based reward尝试复现了一下
 ## AIInfra

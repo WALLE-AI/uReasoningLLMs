@@ -1,3 +1,5 @@
+from data.download_data import extract_hash_answer
+from rl.reward import correctness_reward_func, int_reward_func, soft_format_reward_func, strict_format_reward_func, xmlcount_reward_func
 from unsloth import FastLanguageModel, PatchFastRL
 from vllm import SamplingParams
 
@@ -29,7 +31,6 @@ XML_COT_FORMAT = """\
 </answer>
 """
 
-
 model_path = "meta-llama/meta-Llama-3.1-8B-Instruct"
 
 def load_model_or_tokenizer():
@@ -54,18 +55,6 @@ def load_model_or_tokenizer():
         random_state = 3407,
     )
     return model,tokenizer
-
-
-def extract_xml_answer(text: str) -> str:
-    answer = text.split("<answer>")[-1]
-    answer = answer.split("</answer>")[0]
-    return answer.strip()
-
-def extract_hash_answer(text: str) -> str | None:
-    if "####" not in text:
-        return None
-    return text.split("####")[1].strip()
-
 # uncomment middle messages for 1-shot prompting
 def get_gsm8k_questions(split = "train") -> Dataset:
     import pandas as pd
@@ -92,53 +81,8 @@ def get_gsm8k_questions(split = "train") -> Dataset:
     #     'answer': extract_hash_answer(x['answer'])
     # }) # type: ignore
     return dataset # type: ignore
-
+##补充一下模型训练部分的研究内容，大概写几个点就行。股份公司课题。后面还有具体的技术路线、研究内容展开及国内外发展现状调研的东西要写。但你得把核心的这部分研究内容先给我。技术路线部分，我明天再想办法弄。
 dataset = get_gsm8k_questions()
-
-# Reward functions
-def correctness_reward_func(prompts, completions, answer, **kwargs) -> list[float]:
-    responses = [completion[0]['content'] for completion in completions]
-    q = prompts[0][-1]['content']
-    extracted_responses = [extract_xml_answer(r) for r in responses]
-    print('-'*20, f"Question:\n{q}", f"\nAnswer:\n{answer[0]}", f"\nResponse:\n{responses[0]}", f"\nExtracted:\n{extracted_responses[0]}")
-    return [2.0 if r == a else 0.0 for r, a in zip(extracted_responses, answer)]
-
-def int_reward_func(completions, **kwargs) -> list[float]:
-    responses = [completion[0]['content'] for completion in completions]
-    extracted_responses = [extract_xml_answer(r) for r in responses]
-    return [0.5 if r.isdigit() else 0.0 for r in extracted_responses]
-
-def strict_format_reward_func(completions, **kwargs) -> list[float]:
-    """Reward function that checks if the completion has a specific format."""
-    pattern = r"^<reasoning>\n.*?\n</reasoning>\n<answer>\n.*?\n</answer>\n$"
-    responses = [completion[0]["content"] for completion in completions]
-    matches = [re.match(pattern, r) for r in responses]
-    return [0.5 if match else 0.0 for match in matches]
-
-def soft_format_reward_func(completions, **kwargs) -> list[float]:
-    """Reward function that checks if the completion has a specific format."""
-    pattern = r"<reasoning>.*?</reasoning>\s*<answer>.*?</answer>"
-    responses = [completion[0]["content"] for completion in completions]
-    matches = [re.match(pattern, r) for r in responses]
-    return [0.5 if match else 0.0 for match in matches]
-
-def count_xml(text) -> float:
-    count = 0.0
-    if text.count("<reasoning>\n") == 1:
-        count += 0.125
-    if text.count("\n</reasoning>\n") == 1:
-        count += 0.125
-    if text.count("\n<answer>\n") == 1:
-        count += 0.125
-        count -= len(text.split("\n</answer>\n")[-1])*0.001
-    if text.count("\n</answer>") == 1:
-        count += 0.125
-        count -= (len(text.split("\n</answer>")[-1]) - 1)*0.001
-    return count
-
-def xmlcount_reward_func(completions, **kwargs) -> list[float]:
-    contents = [completion[0]["content"] for completion in completions]
-    return [count_xml(c) for c in contents]
 
 training_args = GRPOConfig(
     use_vllm = True, # use vLLM for fast inference!
