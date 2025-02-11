@@ -31,7 +31,7 @@ XML_COT_FORMAT = """\
 </answer>
 """
 
-model_path = "meta-llama/meta-Llama-3.1-8B-Instruct"
+model_path = "/home/dataset1/gaojing/models/Meta-Llama-3.1-8B-Instruct"
 
 def load_model_or_tokenizer():
     model, tokenizer = FastLanguageModel.from_pretrained(
