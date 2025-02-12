@@ -28,9 +28,15 @@
 * [trl-lib/tldr](https://huggingface.co/datasets/trl-lib/tldr)
 * [prm800k](https://huggingface.co/datasets/HuggingFaceH4/prm800k-trl-dedup)
 * [ReasonFlux_SFT_15k](https://huggingface.co/datasets/Gen-Verse/ReasonFlux_SFT_15k)
+* [OpenR1-Math-220k](https://huggingface.co/datasets/open-r1/OpenR1-Math-220k/tree/main/extended)
+* [OpenThoughts-114k](https://huggingface.co/datasets/open-thoughts/OpenThoughts-114k)
+* [X-R1-7500](https://huggingface.co/datasets/xiaodongguaAIGC/X-R1-7500)
+* [R1-Distill-SFT](https://huggingface.co/datasets/ServiceNow-AI/R1-Distill-SFT)
+* [dolphin-r1](https://huggingface.co/datasets/cognitivecomputations/dolphin-r1)
 ## Distillation
 * [Distill Math Reasoning Data from DeepSeek R1 with CAME](https://docs.camel-ai.org/cookbooks/data_generation/distill_math_reasoning_data_from_deepseek_r1.html)
 * [LLMs-Distillation-Quantification](https://github.com/Aegis1863/LLMs-Distillation-Quantification/tree/main)
+* [open-thoughts](https://github.com/open-thoughts/open-thoughts)通过R1来合成推理数据集来训练最先进的小型推理模型，该模型在数学和代码推理基准上超越DeepSeek-R1-Distill-Qwen-32B和DeepSeek-R1-Distill-Qwen-7B 。
 ## RL
 ### 一些RL知识
 * [什么是GRPO Trainer](https://github.com/huggingface/trl/blob/main/docs/source/grpo_trainer.md)
@@ -52,7 +58,8 @@
 * [DeepScaleR: Surpassing O1-Preview with a 1.5B Model by Scaling RL](https://pretty-radio-b75.notion.site/DeepScaleR-Surpassing-O1-Preview-with-a-1-5B-Model-by-Scaling-RL-19681902c1468005bed8ca303013a4e2)
 * [mini-r1-zero](https://github.com/ahxt/mini-r1-zero)
 * [ReasonFlux](https://github.com/Gen-Verse/ReasonFlux)之开源了SFT阶段训练代码和数据集，RL部分没有开源
-* [OpenR1-Math-220k](https://huggingface.co/datasets/open-r1/OpenR1-Math-220k/tree/main/extended)
+* [grpo_demo](https://gist.github.com/willccbb/4676755236bb08cab5f4e54a0475d6fb)
+* [X-R1](https://github.com/dhcode-cpp/X-R1)
 ### Progress of Replication Domain Project
 * [diagnosis_zero](https://github.com/wizardlancet/diagnosis_zero) 在医疗的疾病诊断任务上拿Qwen2.5-1.5B/3B/7B用R1-Zero那种rule based reward尝试复现了一下
 ## AIInfra
