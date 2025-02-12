@@ -37,6 +37,8 @@
 * [Distill Math Reasoning Data from DeepSeek R1 with CAME](https://docs.camel-ai.org/cookbooks/data_generation/distill_math_reasoning_data_from_deepseek_r1.html)
 * [LLMs-Distillation-Quantification](https://github.com/Aegis1863/LLMs-Distillation-Quantification/tree/main)
 * [open-thoughts](https://github.com/open-thoughts/open-thoughts)通过R1来合成推理数据集来训练最先进的小型推理模型，该模型在数学和代码推理基准上超越DeepSeek-R1-Distill-Qwen-32B和DeepSeek-R1-Distill-Qwen-7B 。
+* [s1: Simple test-time scaling](https://github.com/simplescaling/s1)
+* [LIMO](https://github.com/GAIR-NLP/LIMO)
 ## RL
 ### 一些RL知识
 * [什么是GRPO Trainer](https://github.com/huggingface/trl/blob/main/docs/source/grpo_trainer.md)
@@ -50,7 +52,6 @@
 * [TinyZero](https://github.com/Jiayi-Pan/TinyZero)
 * [oat-zero](https://oatllm.notion.site/oat-zero)
 * [simpleRL-reason](https://github.com/hkust-nlp/simpleRL-reason)
-* [s1: Simple test-time scaling](https://github.com/simplescaling/s1)
 * [RAGEN](https://github.com/ZihanWang314/RAGEN)
 * [R1-V](https://github.com/Deep-Agent/R1-V)
 * [Mini-R1: Reproduce Deepseek R1 „aha moment“ a RL tutorial](https://www.philschmid.de/mini-deepseek-r1)
