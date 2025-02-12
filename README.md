@@ -4,6 +4,7 @@
 * [图解Deepseek-r1](https://zhuanlan.zhihu.com/p/22070707889)
 * [可视化指导推理模型](https://zhuanlan.zhihu.com/p/22193737362)
 * [深度理解推理模型](https://zhuanlan.zhihu.com/p/22660720550)
+* [A Visual Guide to Mixture of Experts (MoE)](https://zhuanlan.zhihu.com/p/23074047123)
 * Deepseek开源砸了多少人"饭碗"
 * Deepseek技术创新真的是"国运创新"？
 ## Prompt
@@ -16,6 +17,7 @@
 * [distilabel_r1_distill](https://github.com/huggingface/open-r1/blob/main/src/open_r1/generate.py)
 * [Math-spepherd](https://github.com/argilla-io/distilabel/tree/main/src/distilabel/steps/tasks/math_shepherd)
 * [magpie](https://magpie-align.github.io/)
+* [Math-Verify](https://github.com/huggingface/Math-Verify)
 * [Camel_ai_cot_agent](https://docs.camel-ai.org/cookbooks/data_generation/self_improving_cot_generation.html)
 ### Opensource Datasets
 * [Bespoke-Stratos-17k](https://huggingface.co/datasets/bespokelabs/Bespoke-Stratos-17k) 使用Deeepseek-R1对[Sky-T1_data_17k](https://huggingface.co/datasets/NovaSky-AI/Sky-T1_data_17k)进行蒸馏 创建Bespoke-Stratos-17k——一个包含问题、推理轨迹和答案的推理数据集。
@@ -50,6 +52,7 @@
 * [DeepScaleR: Surpassing O1-Preview with a 1.5B Model by Scaling RL](https://pretty-radio-b75.notion.site/DeepScaleR-Surpassing-O1-Preview-with-a-1-5B-Model-by-Scaling-RL-19681902c1468005bed8ca303013a4e2)
 * [mini-r1-zero](https://github.com/ahxt/mini-r1-zero)
 * [ReasonFlux](https://github.com/Gen-Verse/ReasonFlux)之开源了SFT阶段训练代码和数据集，RL部分没有开源
+* [OpenR1-Math-220k](https://huggingface.co/datasets/open-r1/OpenR1-Math-220k/tree/main/extended)
 ### Progress of Replication Domain Project
 * [diagnosis_zero](https://github.com/wizardlancet/diagnosis_zero) 在医疗的疾病诊断任务上拿Qwen2.5-1.5B/3B/7B用R1-Zero那种rule based reward尝试复现了一下
 ## AIInfra
@@ -68,3 +71,7 @@
 * [Process Reinforcement through Implicit Rewards](https://curvy-check-498.notion.site/Process-Reinforcement-through-Implicit-Rewards-15f4fcb9c42180f1b498cc9b2eaf896f#1604fcb9c42180bbabc6f67a2866d2c3)
 ## Reference
 * [DeepSeek R1推理相关项目源码分析](https://mp.weixin.qq.com/s/dvy_4uJ5og9IS6J8mPKIQQ)
+* [DeepSeek R1 论文解读&关键技术点梳理](https://mp.weixin.qq.com/s/wckZqmgSmocnIgUPcg5QcQ)
+* [综述 DeepSeek R1、LIMO、S1 等 6 篇文章的关键结论](https://mp.weixin.qq.com/s/04HEd5CUWETck6Ug-pOYjg)
+* [开源22万条DeepSeek R1的高质量数据！你也能复现DeepSeek了](https://mp.weixin.qq.com/s/K4msDYxwYNhNsTRNK0sVwA)
+* [DeepSeek R1 论文解读&关键技术点梳理](https://mp.weixin.qq.com/s/wckZqmgSmocnIgUPcg5QcQ)
