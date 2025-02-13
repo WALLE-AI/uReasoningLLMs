@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 import trl
+from trl import ScriptArguments
 
 
 # TODO: add the shared options with a mixin to reduce code duplication

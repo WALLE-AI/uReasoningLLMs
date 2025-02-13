@@ -15,7 +15,7 @@ num_processes: 7
 bf16: true
 use_vllm: true
 vllm_device: auto
-vllm_gpu_memory_utilization: 0.7
+vllm_gpu_memory_utilization: 0.5
 do_eval: true
 eval_strategy: steps
 eval_steps: 100

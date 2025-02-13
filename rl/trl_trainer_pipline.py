@@ -205,5 +205,5 @@ class TrainerPipline():
     def train_run(self):
         self.train()
         
-        
+
     
