@@ -1,137 +1,196 @@
 import re
 
+from latex2sympy2_extended import NormalizationConfig
+from math_verify import LatexExtractionConfig, parse, verify
 
-def extract_xml_answer(text: str) -> str:
-    answer = text.split("<answer>")[-1]
-    answer = answer.split("</answer>")[0]
-    return answer.strip()
-
-def extract_hash_answer(text: str) -> str | None:
-    if "####" not in text:
-        return None
-    return text.split("####")[1].strip()
-# Reward functions
-def correctness_reward_func(prompts, completions, answer, **kwargs) -> list[float]:
-    responses = [completion[0]['content'] for completion in completions]
-    q = prompts[0][-1]['content']
-    extracted_responses = [extract_xml_answer(r) for r in responses]
-    print('-'*20, f"Question:\n{q}", f"\nAnswer:\n{answer[0]}", f"\nResponse:\n{responses[0]}", f"\nExtracted:\n{extracted_responses[0]}")
-    return [2.0 if r == a else 0.0 for r, a in zip(extracted_responses, answer)]
-
-def int_reward_func(completions, **kwargs) -> list[float]:
-    responses = [completion[0]['content'] for completion in completions]
-    extracted_responses = [extract_xml_answer(r) for r in responses]
-    return [0.5 if r.isdigit() else 0.0 for r in extracted_responses]
-
-def strict_format_reward_func(completions, **kwargs) -> list[float]:
-    """Reward function that checks if the completion has a specific format."""
-    pattern = r"^<reasoning>\n.*?\n</reasoning>\n<answer>\n.*?\n</answer>\n$"
-    responses = [completion[0]["content"] for completion in completions]
-    matches = [re.match(pattern, r) for r in responses]
-    return [0.5 if match else 0.0 for match in matches]
-
-def soft_format_reward_func(completions, **kwargs) -> list[float]:
-    """Reward function that checks if the completion has a specific format."""
-    pattern = r"<reasoning>.*?</reasoning>\s*<answer>.*?</answer>"
-    responses = [completion[0]["content"] for completion in completions]
-    matches = [re.match(pattern, r) for r in responses]
-    return [0.5 if match else 0.0 for match in matches]
-
-def count_xml(text) -> float:
-    count = 0.0
-    if text.count("<reasoning>\n") == 1:
-        count += 0.125
-    if text.count("\n</reasoning>\n") == 1:
-        count += 0.125
-    if text.count("\n<answer>\n") == 1:
-        count += 0.125
-        count -= len(text.split("\n</answer>\n")[-1])*0.001
-    if text.count("\n</answer>") == 1:
-        count += 0.125
-        count -= (len(text.split("\n</answer>")[-1]) - 1)*0.001
-    return count
-
-def xmlcount_reward_func(completions, **kwargs) -> list[float]:
+def accuracy_reward(completions, solution, **kwargs):
+    """Reward function that checks if the completion is the same as the ground truth."""
     contents = [completion[0]["content"] for completion in completions]
-    return [count_xml(c) for c in contents]
+    rewards = []
+    for content, sol in zip(contents, solution):
+        gold_parsed = parse(
+            sol,
+            extraction_mode="first_match",
+            extraction_config=[LatexExtractionConfig()],
+        )
+        if len(gold_parsed) != 0:
+            # We require the answer to be provided in correct latex (no malformed operators)
+            answer_parsed = parse(
+                content,
+                extraction_config=[
+                    LatexExtractionConfig(
+                        normalization_config=NormalizationConfig(
+                            nits=False,
+                            malformed_operators=False,
+                            basic_latex=True,
+                            equations=True,
+                            boxed="all",
+                            units=True,
+                        ),
+                        # Ensures that boxed is tried first
+                        boxed_match_priority=0,
+                        try_extract_without_anchor=False,
+                    )
+                ],
+                extraction_mode="first_match",
+            )
+            # Reward 1 if the content is the same as the ground truth, 0 otherwise
+            reward = float(verify(answer_parsed, gold_parsed))
+        else:
+            # If the gold solution is not parseable, we reward 1 to skip this example
+            reward = 1.0
+            print("Failed to parse gold solution: ", sol)
+        rewards.append(reward)
+
+    return rewards
 
 
-def format_reward_func(completions, target, **kwargs):
+def format_reward(completions, **kwargs):
+    """Reward function that checks if the completion has a specific format."""
+    pattern = r"^<think>.*?</think>\s*<answer>.*?</answer>$"
+    completion_contents = [completion[0]["content"] for completion in completions]
+    matches = [re.match(pattern, content, re.DOTALL | re.MULTILINE) for content in completion_contents]
+    return [1.0 if match else 0.0 for match in matches]
+
+
+def reasoning_steps_reward(completions, **kwargs):
+    r"""Reward function that checks for clear step-by-step reasoning.
+    Regex pattern:
+        Step \d+: - matches "Step 1:", "Step 2:", etc.
+        ^\d+\. - matches numbered lists like "1.", "2.", etc. at start of line
+        \n- - matches bullet points with hyphens
+        \n\* - matches bullet points with asterisks
+        First,|Second,|Next,|Finally, - matches transition words
     """
-    Format: <think>...</think><answer>...</answer>
+    pattern = r"(Step \d+:|^\d+\.|\n-|\n\*|First,|Second,|Next,|Finally,)"
+    completion_contents = [completion[0]["content"] for completion in completions]
+    matches = [len(re.findall(pattern, content)) for content in completion_contents]
+
+    # Magic nubmer 3 to encourage 3 steps and more, otherwise partial reward
+    return [min(1.0, count / 3) for count in matches]
+
+
+def get_cosine_scaled_reward(
+    min_value_wrong: float = -1.0,
+    max_value_wrong: float = -0.5,
+    min_value_correct: float = 0.5,
+    max_value_correct: float = 1.0,
+    max_len: int = 1000,
+):
+    def cosine_scaled_reward(completions, solution, **kwargs):
+        """Reward function that scales based on completion length using a cosine schedule.
+
+        Shorter correct solutions are rewarded more than longer ones.
+        Longer incorrect solutions are penalized less than shorter ones.
+
+        Args:
+            completions: List of model completions
+            solution: List of ground truth solutions
+
+        This function is parameterized by the following arguments:
+            min_value_wrong: Minimum reward for wrong answers
+            max_value_wrong: Maximum reward for wrong answers
+            min_value_correct: Minimum reward for correct answers
+            max_value_correct: Maximum reward for correct answers
+            max_len: Maximum length for scaling
+        """
+        contents = [completion[0]["content"] for completion in completions]
+        rewards = []
+
+        for content, sol in zip(contents, solution):
+            gold_parsed = parse(sol, extraction_mode="first_match", extraction_config=[LatexExtractionConfig()])
+            if len(gold_parsed) == 0:
+                rewards.append(1.0)  # Skip unparseable examples
+                print("Failed to parse gold solution: ", sol)
+                continue
+
+            answer_parsed = parse(
+                content,
+                extraction_config=[
+                    LatexExtractionConfig(
+                        normalization_config=NormalizationConfig(
+                            nits=False,
+                            malformed_operators=False,
+                            basic_latex=True,
+                            equations=True,
+                            boxed=True,
+                            units=True,
+                        ),
+                        boxed_match_priority=0,
+                        try_extract_without_anchor=False,
+                    )
+                ],
+                extraction_mode="first_match",
+            )
+
+            is_correct = verify(answer_parsed, gold_parsed)
+            gen_len = len(content)
+
+            # Apply cosine scaling based on length
+            progress = gen_len / max_len
+            cosine = math.cos(progress * math.pi)
+
+            if is_correct:
+                min_value = min_value_correct
+                max_value = max_value_correct
+            else:
+                # Swap min/max for incorrect answers
+                min_value = max_value_wrong
+                max_value = min_value_wrong
+
+            reward = min_value + 0.5 * (max_value - min_value) * (1.0 + cosine)
+            rewards.append(float(reward))
+
+        return rewards
+
+    return cosine_scaled_reward
+
+
+def get_repetition_penalty_reward(ngram_size: int, max_penalty: float):
+    """
+    Computes N-gram repetition penalty as described in Appendix C.2 of https://arxiv.org/abs/2502.03373.
+    Reference implementation from: https://github.com/eddycmu/demystify-long-cot/blob/release/openrlhf/openrlhf/reward/repetition.py
+
     Args:
-        completions (list[str]): Generated outputs
-        target (list[str]): Expected answers
-      
-      Returns:
-          list[float]: Reward scores
+    ngram_size: size of the n-grams
+    max_penalty: Maximum (negative) penalty for wrong answers
     """
-    rewards = []
- 
-    for completion, gt in zip(completions, target):
- 
-      try:
-        # add synthetic <think> as its already part of the prompt and prefilled for the assistant to more easily match the regex
-        completion = "<think>" + completion        
-        # Check if the format is correct
-        regex = r"^<think>([^<]*(?:<(?!/?think>)[^<]*)*)<\/think>\n<answer>([\s\S]*?)<\/answer>$"
- 
-        match = re.search(regex, completion, re.DOTALL) 
-        # if the format is not correct, reward is 0
-        if match is None or len(match.groups()) != 2:
-            rewards.append(0.0)
-        else:
-            rewards.append(1.0)
-      except Exception:
-        rewards.append(0.0)
-    return rewards
- 
-def equation_reward_func(completions, target, nums, **kwargs):
-    """
-    Evaluates completions based on:
-    2. Mathematical correctness of the answer
- 
-    Args:
-        completions (list[str]): Generated outputs
-        target (list[str]): Expected answers
-        nums (list[str]): Available numbers
-    
-    Returns:
-        list[float]: Reward scores
-    """
-    rewards = []
-    for completion, gt, numbers in zip(completions, target, nums):
-      try:
-        # add synthetic <think> as its already part of the prompt and prefilled for the assistant to more easily match the regex
-        completion = "<think>" + completion
-        # Check if the format is correct
-        match = re.search(r"<answer>(.*?)<\/answer>", completion)
-        if match is None:
-            rewards.append(0.0)
-            continue
-        # Extract the "answer" part from the completion
-        equation = match.group(1).strip()
-        # Extract all numbers from the equation
-        used_numbers = [int(n) for n in re.findall(r'\d+', equation)]
-        
-        # Check if all numbers are used exactly once
-        if sorted(used_numbers) != sorted(numbers):
-            rewards.append(0.0)
-            continue
-        # Define a regex pattern that only allows numbers, operators, parentheses, and whitespace
-        allowed_pattern = r'^[\d+\-*/().\s]+$'
-        if not re.match(allowed_pattern, equation):
-           rewards.append(0.0)
-           continue
-        
-        # Evaluate the equation with restricted globals and locals
-        result = eval(equation, {"__builtins__": None}, {})
-        # Check if the equation is correct and matches the ground truth
-        if abs(float(result) - float(gt)) < 1e-5:
-            rewards.append(1.0)
-        else:
-            rewards.append(0.0)
-      except Exception:
-            # If evaluation fails, reward is 0
-            rewards.append(0.0) 
-    return rewards
+    if max_penalty > 0:
+        raise ValueError(f"max_penalty {max_penalty} should not be positive")
+
+    def zipngram(text: str, ngram_size: int):
+        words = text.lower().split()
+        return zip(*[words[i:] for i in range(ngram_size)])
+
+    def repetition_penalty_reward(completions, **kwargs) -> float:
+        """
+        reward function the penalizes repetitions
+        ref implementation: https://github.com/eddycmu/demystify-long-cot/blob/release/openrlhf/openrlhf/reward/repetition.py
+
+        Args:
+            completions: List of model completions
+        """
+
+        contents = [completion[0]["content"] for completion in completions]
+        rewards = []
+        for completion in contents:
+            if completion == "":
+                rewards.append(0.0)
+                continue
+            if len(completion.split()) < ngram_size:
+                rewards.append(0.0)
+                continue
+
+            ngrams = set()
+            total = 0
+            for ng in zipngram(completion, ngram_size):
+                ngrams.add(ng)
+                total += 1
+
+            scaling = 1 - len(ngrams) / total
+            reward = scaling * max_penalty
+            rewards.append(reward)
+        return rewards
+
+    return repetition_penalty_reward
+
