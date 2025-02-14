@@ -3,6 +3,7 @@ import sys
 from typing import List
 from datasets import load_dataset,Dataset
 from loguru import logger
+import loguru
 from transformers import set_seed
 from dataclasses import dataclass, field
 import logging
@@ -205,6 +206,11 @@ class TrainerPipline():
     
     def train_run(self):
         self.train()
+
+if __name__ == "__main__":
+    loguru.logger.info("train reasoning starting...")  
+    pipline =TrainerPipline()
+    pipline.train_run()
         
 
     

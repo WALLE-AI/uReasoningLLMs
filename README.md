@@ -33,6 +33,7 @@
 * [X-R1-7500](https://huggingface.co/datasets/xiaodongguaAIGC/X-R1-7500)
 * [R1-Distill-SFT](https://huggingface.co/datasets/ServiceNow-AI/R1-Distill-SFT)
 * [dolphin-r1](https://huggingface.co/datasets/cognitivecomputations/dolphin-r1)
+* [r1_mix_1024.jsonl](https://huggingface.co/datasets/jingyaogong/minimind_dataset/blob/main/r1_mix_1024.jsonl)
 ## Distillation
 * [Distill Math Reasoning Data from DeepSeek R1 with CAME](https://docs.camel-ai.org/cookbooks/data_generation/distill_math_reasoning_data_from_deepseek_r1.html)
 * [LLMs-Distillation-Quantification](https://github.com/Aegis1863/LLMs-Distillation-Quantification/tree/main)
@@ -63,6 +64,7 @@
 * [X-R1](https://github.com/dhcode-cpp/X-R1)
 ### Progress of Replication Domain Project
 * [diagnosis_zero](https://github.com/wizardlancet/diagnosis_zero) 在医疗的疾病诊断任务上拿Qwen2.5-1.5B/3B/7B用R1-Zero那种rule based reward尝试复现了一下
+* [PatientSeek](https://huggingface.co/whyhow-ai/PatientSeek)使用unsloth 单卡Int4上面基于DeepSeek-R1-Distill-Llama-8B微调作为的非常浅，但是业务场景思路很好
 ## AIInfra
 * 这里主要针对于低成本复现R1的策略,本项目会针对于上述开源项目进行复现，并且具体给出对应的硬件成本估算
 * [Sky-T1: Train your own O1 preview model within $450](https://novasky-ai.github.io/posts/sky-t1/)
