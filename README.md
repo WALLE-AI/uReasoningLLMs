@@ -34,12 +34,15 @@
 * [R1-Distill-SFT](https://huggingface.co/datasets/ServiceNow-AI/R1-Distill-SFT)
 * [dolphin-r1](https://huggingface.co/datasets/cognitivecomputations/dolphin-r1)
 * [r1_mix_1024.jsonl](https://huggingface.co/datasets/jingyaogong/minimind_dataset/blob/main/r1_mix_1024.jsonl)
+* [Magpie-Reasoning-V2-250K-CoT-Deepseek-R1-Llama-70B](https://huggingface.co/datasets/Magpie-Align/Magpie-Reasoning-V2-250K-CoT-Deepseek-R1-Llama-70B)
 ## Distillation
 * [Distill Math Reasoning Data from DeepSeek R1 with CAME](https://docs.camel-ai.org/cookbooks/data_generation/distill_math_reasoning_data_from_deepseek_r1.html)
 * [LLMs-Distillation-Quantification](https://github.com/Aegis1863/LLMs-Distillation-Quantification/tree/main)
 * [open-thoughts](https://github.com/open-thoughts/open-thoughts)通过R1来合成推理数据集来训练最先进的小型推理模型，该模型在数学和代码推理基准上超越DeepSeek-R1-Distill-Qwen-32B和DeepSeek-R1-Distill-Qwen-7B 。
 * [s1: Simple test-time scaling](https://github.com/simplescaling/s1)
 * [LIMO](https://github.com/GAIR-NLP/LIMO)
+### Medical R1 Datastes
+* [medical-o1-reasoning-SFT](https://huggingface.co/datasets/FreedomIntelligence/medical-o1-reasoning-SFT)
 ## RL
 ### 一些RL知识
 * [什么是GRPO Trainer](https://github.com/huggingface/trl/blob/main/docs/source/grpo_trainer.md)
@@ -79,6 +82,7 @@
 * [Speculations on Test-Time Scaling](https://srush.github.io/awesome-o1/o1-tutorial.pdf)
 * [Buffer of Thoughts: Thought-Augmented Reasoning with Large Language Models](https://github.com/YangLing0818/buffer-of-thought-llm/tree/main)
 * [Process Reinforcement through Implicit Rewards](https://curvy-check-498.notion.site/Process-Reinforcement-through-Implicit-Rewards-15f4fcb9c42180f1b498cc9b2eaf896f#1604fcb9c42180bbabc6f67a2866d2c3)
+* [Distillation Scaling Laws]()
 ## Reference
 * [DeepSeek R1推理相关项目源码分析](https://mp.weixin.qq.com/s/dvy_4uJ5og9IS6J8mPKIQQ)
 * [DeepSeek R1 论文解读&关键技术点梳理](https://mp.weixin.qq.com/s/wckZqmgSmocnIgUPcg5QcQ)
