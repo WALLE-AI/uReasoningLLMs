@@ -9,9 +9,9 @@ import logging
 import transformers
 from rl.config import GRPOConfig, GRPOScriptArguments
 from rl.prompt import SYSTEM_PROMPT
-from rl.reward import accuracy_reward, format_reward, get_cosine_scaled_reward, get_repetition_penalty_reward, reasoning_steps_reward
+from rl.reward import accuracy_reward, format_reward, get_cosine_scaled_reward, get_repetition_penalty_reward, len_reward, reasoning_steps_reward
 from rl.utils.callbacks import get_callbacks
-from rl.utils.logging import init_wandb_training
+from rl.utils.wandb_logging import init_wandb_training
 from transformers.trainer_utils import get_last_checkpoint
 import datasets
 import torch
@@ -44,6 +44,7 @@ class TrainerPipline():
                 ngram_size=script_args.repetition_n_grams,
                 max_penalty=script_args.repetition_max_penalty,
             ),
+            "length": len_reward,
         }
         reward_funcs = [REWARD_FUNCS_REGISTRY[func] for func in script_args.reward_funcs]
         return reward_funcs

@@ -40,9 +40,6 @@ import os
 import sys
 
 import datasets
-from rl.config import SFTConfig
-from rl.utils.callbacks import get_callbacks
-from rl.utils.logging import init_wandb_training
 import torch
 import transformers
 from datasets import load_dataset
@@ -58,6 +55,10 @@ from trl import (
     get_peft_config,
     get_quantization_config,
 )
+
+from rl.config import SFTConfig
+from rl.utils.callbacks import get_callbacks
+from rl.utils.wandb_logging import init_wandb_training
 
 
 logger = logging.getLogger(__name__)
