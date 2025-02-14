@@ -9,6 +9,10 @@ output_dir: runs/qwen-2.5-3b-r1-countdown
 
 # Dataset arguments
 dataset_id_or_path: Jiayi-Pan/Countdown-Tasks-3to4
+# Data training arguments
+dataset_name: AI-MO/NuminaMath-TIR
+dataset_configs:
+- all
 
 # Lora Arguments
 # No LoRA is used here

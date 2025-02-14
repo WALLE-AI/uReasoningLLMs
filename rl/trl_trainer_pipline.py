@@ -2,7 +2,6 @@ import os
 import sys
 from typing import List
 from datasets import load_dataset,Dataset
-from loguru import logger
 import loguru
 from transformers import set_seed
 from dataclasses import dataclass, field
@@ -18,14 +17,14 @@ import datasets
 import torch
 
 from trl import GRPOTrainer,ModelConfig, TrlParser,get_peft_config
-
+logger = logging.getLogger(__name__)
 
 class TrainerPipline():
-    def __init__(self):
+    def __init__(self,script_args, training_args, model_args):
         self.desc = "trainer pipline"
-        self.script_args, self.training_args, self.model_args = self._set_args_paresr()
+        self.script_args, self.training_args, self.model_args = script_args, training_args, model_args
         
-    def get_reward_func(self,script_args) -> List:
+    def get_reward_func(self) -> List:
         '''
         get reward fun
         '''
@@ -50,31 +49,36 @@ class TrainerPipline():
         reward_funcs = [REWARD_FUNCS_REGISTRY[func] for func in script_args.reward_funcs]
         return reward_funcs
     
-    def load_or_prepare_datasets(self,datasets_id:str,local_path:str="")->Dataset:
+    def load_or_prepare_datasets(self)->Dataset:
         '''
-        本地加载和HF加载
+        本地加载和HF加载 local_path=script_args.local_dataset_path,
+                                                                  script_args=script_args.random_sample
         '''
         try:
-            if os.path.exists(local_path):
+            if os.path.exists(script_args.local_dataset_path):
                 import pandas as pd
-                data_df = pd.read_parquet(local_path)
+                data_df = pd.read_parquet(script_args.local_dataset_path)
                 data_list = [data.to_dict() for index,data in data_df.iterrows()]
                 df = pd.DataFrame(data_list)
                 dataset = Dataset.from_pandas(df)
             else:
-                logger.info(f"from huggingface datastes download {datasets_id}")
-                dataset = load_dataset(datasets_id)
+                logger.info(f"from huggingface datastes download {script_args.dataset_name}")
+                dataset = load_dataset(script_args.dataset_name)
             # split the dataset into train and test
+                # select a random subset of 50k samples
+            if script_args.random_sample:
+                dataset = dataset.shuffle(seed=42).select(range(script_args.random_sample))
             train_test_split = dataset.train_test_split(test_size=0.1)
             train_dataset = train_test_split["train"]
             test_dataset = train_test_split["test"]
             ##进行预处理
-            train_dataset,test_dataset = self._prepare_dataset()
+            train_dataset= self._prepare_dataset(dataset=train_dataset)
+            test_dataset = self._prepare_dataset(dataset=test_dataset)
             return train_dataset,test_dataset
         except RuntimeError as e:
             logger.info(f"load datsets error:{e}")
  
-     # Format into conversation不同复现策略这里有点区别
+     # Format into conversation不同复现策略这里有点区别 都是数学题目
     def make_conversation(self,example):
         return {
             "prompt": [
@@ -132,7 +136,7 @@ class TrainerPipline():
 
         if "wandb" in self.training_args.report_to:
             init_wandb_training(self.training_args)
-        
+        ##
         train_datset,test_dataset = self.load_or_prepare_datasets()
 
         logger.info("*** Initializing model kwargs ***")
@@ -208,8 +212,10 @@ class TrainerPipline():
         self.train()
 
 if __name__ == "__main__":
-    loguru.logger.info("train reasoning starting...")  
-    pipline =TrainerPipline()
+    loguru.logger.info("train reasoning starting...")
+    parser = TrlParser((GRPOScriptArguments, GRPOConfig, ModelConfig))
+    script_args, training_args, model_args = parser.parse_args_and_config()  
+    pipline =TrainerPipline(script_args, training_args, model_args)
     pipline.train_run()
         
 
