@@ -6,6 +6,7 @@ import loguru
 from transformers import set_seed
 from dataclasses import dataclass, field
 import logging
+import json
 import transformers
 from rl.config import GRPOConfig, GRPOScriptArguments
 from rl.prompt import SYSTEM_PROMPT
@@ -13,6 +14,7 @@ from rl.reward import accuracy_reward, format_reward, get_cosine_scaled_reward, 
 from rl.utils.callbacks import get_callbacks
 from rl.utils.wandb_logging import init_wandb_training
 from transformers.trainer_utils import get_last_checkpoint
+import pandas as pd
 import datasets
 import torch
 
@@ -48,6 +50,21 @@ class TrainerPipline():
         }
         reward_funcs = [REWARD_FUNCS_REGISTRY[func] for func in script_args.reward_funcs]
         return reward_funcs
+
+    def local_data_to_datasets(self):
+        _, file_extension = os.path.splitext(script_args.local_dataset_path)
+        file_extension = file_extension.lower()
+        data_list =[]
+        if file_extension == ".json" or file_extension == ".jsonl":
+            with open(script_args.local_dataset_path,"r",encoding="utf-8") as file:
+                data_list = [data for data in json.loads(file.read())]
+        elif file_extension == ".parquet":
+            data_df = pd.read_parquet(script_args.local_dataset_path)
+            data_list = [data.to_dict() for index,data in data_df.iterrows()]
+        df = pd.DataFrame(data_list)
+        dataset = Dataset.from_pandas(df)
+        return dataset
+
     
     def load_or_prepare_datasets(self)->Dataset:
         '''
@@ -56,11 +73,7 @@ class TrainerPipline():
         '''
         try:
             if os.path.exists(script_args.local_dataset_path):
-                import pandas as pd
-                data_df = pd.read_parquet(script_args.local_dataset_path)
-                data_list = [data.to_dict() for index,data in data_df.iterrows()]
-                df = pd.DataFrame(data_list)
-                dataset = Dataset.from_pandas(df)
+                dataset = self.local_data_to_datasets()
             else:
                 logger.info(f"from huggingface datastes download {script_args.dataset_name}")
                 dataset = load_dataset(script_args.dataset_name)
