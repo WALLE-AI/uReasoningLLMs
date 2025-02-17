@@ -1,0 +1,55 @@
+# required >  8 x A100 40G GPU
+# running time ~32h
+
+# Model arguments
+model_name_or_path: xxxx/models/Qwen2.5-3B-Instruct
+model_revision: main
+torch_dtype: bfloat16
+
+# Data training arguments
+dataset_name: xiaodongguaAIGC/X-R1-7500 # 750 / 1500 / 7500
+dataset_configs:
+- train
+num_processes: 7
+
+# GRPO trainer config
+use_vllm: true
+output_dir: /home/dataset0/images/reasoning_model/X-R1-3B
+gradient_accumulation_steps: 1
+max_prompt_length: 256
+num_generations: 7
+max_completion_length: 1024
+
+bf16: true
+vllm_device: "cuda:7"
+vllm_gpu_memory_utilization: 0.5
+do_eval: false
+eval_strategy: "steps"
+eval_steps: 100
+gradient_checkpointing: true
+gradient_checkpointing_kwargs:
+  use_reentrant: false
+hub_model_id: xxxx/Qwen2.5-7B-Instruct
+hub_strategy: every_save
+learning_rate: 3.0e-06
+log_level: info
+logging_steps: 10
+logging_strategy: steps
+lr_scheduler_type: cosine
+max_steps: -1
+num_train_epochs: 1
+overwrite_output_dir: true
+per_device_eval_batch_size: 1
+per_device_train_batch_size: 1
+push_to_hub: False
+##report setting
+report_to:
+- wandb
+wandb_entity: uidh_aigc
+wandb_project: DS-R1
+wandb_name: starchat-construct-cost-3b-r1
+##save model 
+save_strategy: "steps"
+save_steps: 100
+seed: 42
+warmup_ratio: 0.1

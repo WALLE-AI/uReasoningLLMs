@@ -46,6 +46,9 @@
 ## RL
 ### 一些RL知识
 * [什么是GRPO Trainer](https://github.com/huggingface/trl/blob/main/docs/source/grpo_trainer.md)
+* [【手撕LLM-GRPO】你只管给Reward, 剩下的交给RL（附代码）](https://zhuanlan.zhihu.com/p/20812786520)
+* [PPO & GRPO 可视化介绍](https://mp.weixin.qq.com/s/HE5wUIzg5c2u2yqEVVB9fw)
+* [从理论到代码剖析DeepSeek-R1：从PPO到Reinforce++，再对比GRPO](https://mp.weixin.qq.com/s/7NiKjgGSujrDvndxqyWk-Q)
 ### PRM(Process Reward Models)
 * [Process Reinforcement Through Implicit Rewards](https://github.com/PRIME-RL/PRIME)
 ### ORM(Outcome Reward Models)
@@ -89,3 +92,4 @@
 * [综述 DeepSeek R1、LIMO、S1 等 6 篇文章的关键结论](https://mp.weixin.qq.com/s/04HEd5CUWETck6Ug-pOYjg)
 * [开源22万条DeepSeek R1的高质量数据！你也能复现DeepSeek了](https://mp.weixin.qq.com/s/K4msDYxwYNhNsTRNK0sVwA)
 * [DeepSeek R1 论文解读&关键技术点梳理](https://mp.weixin.qq.com/s/wckZqmgSmocnIgUPcg5QcQ)
+* [A vision researcher’s guide to some RL stuff: PPO & GRPO](https://yugeten.github.io/posts/2025/01/ppogrpo/)
