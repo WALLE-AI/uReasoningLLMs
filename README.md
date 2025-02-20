@@ -35,17 +35,20 @@
 * [dolphin-r1](https://huggingface.co/datasets/cognitivecomputations/dolphin-r1)
 * [r1_mix_1024.jsonl](https://huggingface.co/datasets/jingyaogong/minimind_dataset/blob/main/r1_mix_1024.jsonl)
 * [Magpie-Reasoning-V2-250K-CoT-Deepseek-R1-Llama-70B](https://huggingface.co/datasets/Magpie-Align/Magpie-Reasoning-V2-250K-CoT-Deepseek-R1-Llama-70B)
+### Medical R1 Datastes
+* [medical-o1-reasoning-SFT](https://huggingface.co/datasets/FreedomIntelligence/medical-o1-reasoning-SFT)
+## Multi-Model Datasets
+* [open-r1-video-4k](https://huggingface.co/datasets/Xiaodong/open-r1-video-4k)
 ## Distillation
 * [Distill Math Reasoning Data from DeepSeek R1 with CAME](https://docs.camel-ai.org/cookbooks/data_generation/distill_math_reasoning_data_from_deepseek_r1.html)
 * [LLMs-Distillation-Quantification](https://github.com/Aegis1863/LLMs-Distillation-Quantification/tree/main)
 * [open-thoughts](https://github.com/open-thoughts/open-thoughts)通过R1来合成推理数据集来训练最先进的小型推理模型，该模型在数学和代码推理基准上超越DeepSeek-R1-Distill-Qwen-32B和DeepSeek-R1-Distill-Qwen-7B 。
 * [s1: Simple test-time scaling](https://github.com/simplescaling/s1)
 * [LIMO](https://github.com/GAIR-NLP/LIMO)
-### Medical R1 Datastes
-* [medical-o1-reasoning-SFT](https://huggingface.co/datasets/FreedomIntelligence/medical-o1-reasoning-SFT)
 ## RL
 ### 一些RL知识
 * [什么是GRPO Trainer](https://github.com/huggingface/trl/blob/main/docs/source/grpo_trainer.md)
+* [GRPO Trainer](https://huggingface.co/docs/trl/main/en/grpo_trainer)
 * [【手撕LLM-GRPO】你只管给Reward, 剩下的交给RL（附代码）](https://zhuanlan.zhihu.com/p/20812786520)
 * [PPO & GRPO 可视化介绍](https://mp.weixin.qq.com/s/HE5wUIzg5c2u2yqEVVB9fw)
 * [从理论到代码剖析DeepSeek-R1：从PPO到Reinforce++，再对比GRPO](https://mp.weixin.qq.com/s/7NiKjgGSujrDvndxqyWk-Q)
@@ -60,7 +63,6 @@
 * [oat-zero](https://oatllm.notion.site/oat-zero)
 * [simpleRL-reason](https://github.com/hkust-nlp/simpleRL-reason)
 * [RAGEN](https://github.com/ZihanWang314/RAGEN)
-* [R1-V](https://github.com/Deep-Agent/R1-V)
 * [Mini-R1: Reproduce Deepseek R1 „aha moment“ a RL tutorial](https://www.philschmid.de/mini-deepseek-r1)
 * [unlock-deepseek](https://github.com/datawhalechina/unlock-deepseek)
 * [DeepScaleR: Surpassing O1-Preview with a 1.5B Model by Scaling RL](https://pretty-radio-b75.notion.site/DeepScaleR-Surpassing-O1-Preview-with-a-1-5B-Model-by-Scaling-RL-19681902c1468005bed8ca303013a4e2)
@@ -68,6 +70,11 @@
 * [ReasonFlux](https://github.com/Gen-Verse/ReasonFlux)之开源了SFT阶段训练代码和数据集，RL部分没有开源
 * [grpo_demo](https://gist.github.com/willccbb/4676755236bb08cab5f4e54a0475d6fb)
 * [X-R1](https://github.com/dhcode-cpp/X-R1)
+### Multi-Models R1
+* [Open-R1-Video](https://github.com/Wang-Xiaodong1899/Open-R1-Video)
+* [open-r1-multimodal](https://github.com/EvolvingLMMs-Lab/open-r1-multimodal)
+* [VLM-R1](https://github.com/om-ai-lab/VLM-R1) 在 open-r1-multimodal修改参数
+* [R1-V](https://github.com/Deep-Agent/R1-V)
 ### Progress of Replication Domain Project
 * [diagnosis_zero](https://github.com/wizardlancet/diagnosis_zero) 在医疗的疾病诊断任务上拿Qwen2.5-1.5B/3B/7B用R1-Zero那种rule based reward尝试复现了一下
 * [PatientSeek](https://huggingface.co/whyhow-ai/PatientSeek)使用unsloth 单卡Int4上面基于DeepSeek-R1-Distill-Llama-8B微调作为的非常浅，但是业务场景思路很好
