@@ -70,6 +70,8 @@
 * [ReasonFlux](https://github.com/Gen-Verse/ReasonFlux)之开源了SFT阶段训练代码和数据集，RL部分没有开源
 * [grpo_demo](https://gist.github.com/willccbb/4676755236bb08cab5f4e54a0475d6fb)
 * [X-R1](https://github.com/dhcode-cpp/X-R1)
+* [Open-Reasoner-Zero](https://github.com/Open-Reasoner-Zero/Open-Reasoner-Zero)
+* [lmm-r1](https://github.com/TideDra/lmm-r1)
 ### Multi-Models R1
 * [Open-R1-Video](https://github.com/Wang-Xiaodong1899/Open-R1-Video)
 * [open-r1-multimodal](https://github.com/EvolvingLMMs-Lab/open-r1-multimodal)
