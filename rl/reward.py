@@ -243,6 +243,27 @@ def simple_length_reward(completions, **kwargs):
     length_rewards = [0.5 if len(content) > 500 else 0.0 for content in completion_contents]
     return length_rewards
 
+def tag_count_reward(completions, **kwargs) -> list[float]:
+    """Reward function that checks if we produce the desired number of think and answer tags associated with `format_reward()`.
+
+    Adapted from: https://gist.github.com/willccbb/4676755236bb08cab5f4e54a0475d6fb#file-grpo_demo-py-L90
+    """
+
+    def count_tags(text: str) -> float:
+        count = 0.0
+        if text.count("<think>\n") == 1:
+            count += 0.25
+        if text.count("\n</think>\n") == 1:
+            count += 0.25
+        if text.count("\n<answer>\n") == 1:
+            count += 0.25
+        if text.count("\n</answer>") == 1:
+            count += 0.25
+        return count
+
+    contents = [completion[0]["content"] for completion in completions]
+    return [count_tags(c) for c in contents]
+
 def get_cosine_scaled_reward(
     min_value_wrong: float = -1.0,
     max_value_wrong: float = -0.5,

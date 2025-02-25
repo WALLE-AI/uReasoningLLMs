@@ -21,6 +21,7 @@ from rl.reward import (
     simple_length_reward,
     soft_format_reward_func,
     strict_format_reward_func,
+    tag_count_reward,
     xmlcount_reward_func,
 )
 from rl.utils.callbacks import get_callbacks
@@ -69,7 +70,8 @@ class TrainerPipline():
             "reflection_reward_ratio":reflection_reward_ratio,
             "simple_length_reward":simple_length_reward,
             "code_reward":code_reward,
-            "get_code_format_reward":get_code_format_reward
+            "get_code_format_reward":get_code_format_reward,
+            "tag_count_reward":tag_count_reward
             
         }
         reward_funcs = [REWARD_FUNCS_REGISTRY[func] for func in script_args.reward_funcs]
