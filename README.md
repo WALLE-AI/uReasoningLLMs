@@ -19,6 +19,7 @@
 * [magpie](https://magpie-align.github.io/)
 * [Math-Verify](https://github.com/huggingface/Math-Verify)
 * [Camel_ai_cot_agent](https://docs.camel-ai.org/cookbooks/data_generation/self_improving_cot_generation.html)
+* [open_thoughts](https://github.com/open-thoughts/open-thoughts/tree/main/open_thoughts)
 ### Opensource Datasets
 * [Bespoke-Stratos-17k](https://huggingface.co/datasets/bespokelabs/Bespoke-Stratos-17k) 使用Deeepseek-R1对[Sky-T1_data_17k](https://huggingface.co/datasets/NovaSky-AI/Sky-T1_data_17k)进行蒸馏 创建Bespoke-Stratos-17k——一个包含问题、推理轨迹和答案的推理数据集。
 * [Countdown-Tasks-3to4](https://huggingface.co/datasets/Jiayi-Pan/Countdown-Tasks-3to4)
@@ -57,7 +58,7 @@
 ### ORM(Outcome Reward Models)
 ### Progress of Replication Project
 * [Llama3.1_(8B)-GRPO](https://colab.research.google.com/github/unslothai/notebooks/blob/main/nb/Llama3.1_(8B)-GRPO.ipynb#scrollTo=XjjUb0hqE6nm)
-* [Logic-RL](https://github.com/Unakar/Logic-RL)
+* [Logic-RL](https://github.com/Unakar/Logic-RL) 
 * [open-r1](https://github.com/huggingface/open-r1)
 * [TinyZero](https://github.com/Jiayi-Pan/TinyZero)
 * [oat-zero](https://oatllm.notion.site/oat-zero)
