@@ -1,12 +1,21 @@
 """Reward functions for GRPO training."""
 
+import json
 import math
 import re
 from typing import Dict
+from openai import OpenAI
 
 from latex2sympy2_extended import NormalizationConfig
 from math_verify import LatexExtractionConfig, parse, verify
 
+from rl.utils.model_utils import is_e2b_available
+
+if is_e2b_available():
+    from dotenv import load_dotenv
+    from e2b_code_interpreter import Sandbox
+
+    load_dotenv()
 
 def accuracy_reward(completions, solution, **kwargs):
     """Reward function that checks if the completion is the same as the ground truth."""
@@ -51,11 +60,92 @@ def accuracy_reward(completions, solution, **kwargs):
 
 
 def format_reward(completions, **kwargs):
-    """Reward function that checks if the completion has a specific format."""
+    """Reward function that checks if the reasoning process is enclosed within <think> and </think> tags, while the final answer is enclosed within <answer> and </answer> tags."""
     pattern = r"^<think>.*?</think>\s*<answer>.*?</answer>$"
     completion_contents = [completion[0]["content"] for completion in completions]
     matches = [re.match(pattern, content, re.DOTALL | re.MULTILINE) for content in completion_contents]
     return [1.0 if match else 0.0 for match in matches]
+
+##https://www.philschmid.de/mini-deepseek-r1
+def format_reward_func(completions, **kwargs):
+    """
+    Format: <think>...</think><answer>...</answer>
+    Args:
+        completions (list[str]): Generated outputs
+        target (list[str]): Expected answers
+      
+      Returns:
+          list[float]: Reward scores
+    """
+    rewards = []
+ 
+    for completion in completions:
+ 
+      try:
+        # add synthetic <think> as its already part of the prompt and prefilled for the assistant to more easily match the regex
+        completion = "<think>" + completion        
+        # Check if the format is correct
+        regex = r"^<think>([^<]*(?:<(?!/?think>)[^<]*)*)<\/think>\n<answer>([\s\S]*?)<\/answer>$"
+ 
+        match = re.search(regex, completion, re.DOTALL) 
+        # if the format is not correct, reward is 0
+        if match is None or len(match.groups()) != 2:
+            rewards.append(0.0)
+        else:
+            rewards.append(1.0)
+      except Exception:
+        rewards.append(0.0)
+    return rewards
+
+def equation_reward_func(completions, target, nums, **kwargs):
+    """
+    Evaluates completions based on:
+    2. Mathematical correctness of the answer
+ 
+    Args:
+        completions (list[str]): Generated outputs
+        target (list[str]): Expected answers
+        nums (list[str]): Available numbers
+    
+    Returns:
+        list[float]: Reward scores
+    """
+    rewards = []
+    for completion, gt, numbers in zip(completions, target, nums):
+      try:
+        # add synthetic <think> as its already part of the prompt and prefilled for the assistant to more easily match the regex
+        completion = "<think>" + completion
+        # Check if the format is correct
+        match = re.search(r"<answer>(.*?)<\/answer>", completion)
+        if match is None:
+            rewards.append(0.0)
+            continue
+        # Extract the "answer" part from the completion
+        equation = match.group(1).strip()
+        # Extract all numbers from the equation
+        used_numbers = [int(n) for n in re.findall(r'\d+', equation)]
+        
+        # Check if all numbers are used exactly once
+        if sorted(used_numbers) != sorted(numbers):
+            rewards.append(0.0)
+            continue
+        # Define a regex pattern that only allows numbers, operators, parentheses, and whitespace
+        allowed_pattern = r'^[\d+\-*/().\s]+$'
+        if not re.match(allowed_pattern, equation):
+           rewards.append(0.0)
+           continue
+        
+        # Evaluate the equation with restricted globals and locals
+        result = eval(equation, {"__builtins__": None}, {})
+        # Check if the equation is correct and matches the ground truth
+        if abs(float(result) - float(gt)) < 1e-5:
+            rewards.append(1.0)
+        else:
+            rewards.append(0.0)
+      except Exception:
+            # If evaluation fails, reward is 0
+            rewards.append(0.0) 
+    return rewards
 
 
 def reasoning_steps_reward(completions, **kwargs):
@@ -147,6 +237,11 @@ def len_reward(completions: list[Dict[str, str]], solutions: list[str], **kwargs
 
     return rewards
 
+def simple_length_reward(completions, **kwargs):
+    completion_contents = [completion[0]["content"] for completion in completions]
+    # length_rewards = [len(content)/5000.0 for content in completion_contents]
+    length_rewards = [0.5 if len(content) > 500 else 0.0 for content in completion_contents]
+    return length_rewards
 
 def get_cosine_scaled_reward(
     min_value_wrong: float = -1.0,
@@ -271,3 +366,245 @@ def get_repetition_penalty_reward(ngram_size: int, max_penalty: float):
         return rewards
 
     return repetition_penalty_reward
+
+##https://colab.research.google.com/github/unslothai/notebooks/blob/main/nb/Llama3.1_(8B)-GRPO.ipynb#scrollTo=cXk993X6C2ZZ
+def extract_hash_answer(text: str) -> str | None:
+    if "####" not in text:
+        return None
+    return text.split("####")[1].strip()
+
+def extract_xml_answer(text: str) -> str:
+    answer = text.split("<answer>")[-1]
+    answer = answer.split("</answer>")[0]
+    return answer.strip()
+
+def soft_format_reward_func(completions, **kwargs) -> list[float]:
+    """Reward function that checks if the completion has a specific format."""
+    pattern = r"<think>.*?</think>\s*<answer>.*?</answer>"
+    responses = [completion[0]["content"] for completion in completions]
+    matches = [re.match(pattern, r) for r in responses]
+    return [0.5 if match else 0.0 for match in matches]
+
+def strict_format_reward_func(completions, **kwargs) -> list[float]:
+    """Reward function that checks if the completion has a specific format."""
+    pattern = r"^<think>\n.*?\n</think>\n<answer>\n.*?\n</answer>\n$"
+    responses = [completion[0]["content"] for completion in completions]
+    matches = [re.match(pattern, r) for r in responses]
+    return [0.5 if match else 0.0 for match in matches]
+
+def int_reward_func(completions, **kwargs) -> list[float]:
+    responses = [completion[0]['content'] for completion in completions]
+    extracted_responses = [extract_xml_answer(r) for r in responses]
+    return [0.5 if r.isdigit() else 0.0 for r in extracted_responses]
+
+def count_xml(text) -> float:
+    count = 0.0
+    if text.count("<think>\n") == 1:
+        count += 0.125
+    if text.count("\n</think>\n") == 1:
+        count += 0.125
+    if text.count("\n<answer>\n") == 1:
+        count += 0.125
+        count -= len(text.split("\n</answer>\n")[-1])*0.001
+    if text.count("\n</answer>") == 1:
+        count += 0.125
+        count -= (len(text.split("\n</answer>")[-1]) - 1)*0.001
+    return count
+
+def xmlcount_reward_func(completions, **kwargs) -> list[float]:
+    contents = [completion[0]["content"] for completion in completions]
+    return [count_xml(c) for c in contents]
+
+
+
+def reflection_reward_ratio(completions, **kwargs):
+    '''
+    ##统计出reflection keyword 反思与正确反思的  怎么收集各个模型反思的关键字
+    https://github.com/sail-sg/oat-zero/blob/a4dd099adf25a32ba162b690ce22aaaf10b55285/analysis/eval_self_reflect.py#L28
+    https://github.com/ahxt/mini-r1-zero
+    "wait": 0.1,"possible": 0"perhaps": 0.1"check": 0.1,"perhaps": 0."maybe": 0.1,"let me": 0.1"would be":0"but the": 0.1"wait but":0
+    "check if": 0
+    "but how": 0.
+    "but the": 0.2
+    "wait no":0.
+    "but wait":0
+    "let me check'
+    "let me think
+    "but let me":
+    '''
+    completion_contents = [completion[0]["content"].lower() for completion in completions]
+
+    reflection_words = {
+        "wait": 0.1,
+        "possible": 0.1,
+        "perhaps": 0.1,
+        "check": 0.1,
+        "perhaps": 0.1,
+        "maybe": 0.1,
+        "let me": 0.1,
+        "would be": 0.1,
+        "but the": 0.1,
+        "wait but": 0.1,
+        "check if": 0.1,
+        "but how": 0.1,
+        "but the": 0.1,
+        "wait no": 0.1,
+        "but wait": 0.1,
+        "let me check": 0.1,
+        "let me think": 0.1,
+        "but let me": 0.1,
+        "recheck": 0.1,
+        "rethink": 0.1,
+        "try again": 0.1
+        
+    }
+
+    completion_contents_org = [completion[0]["content"] for completion in completions]
+    self_rewards = [0.1 if " I " in content else 0 for content in completion_contents_org]
+    
+    scores = [sum(reflection_words.get(marker, 0.0) for marker in content.split()) for content in completion_contents]
+    reflection_rewards = [score if score > 0.0 else 0.0 for score in scores]
+    reflection_rewards = [reflection_reward + self_reward for reflection_reward, self_reward in zip(reflection_rewards, self_rewards)]
+
+    return reflection_rewards
+
+
+def extract_code(completion: str) -> str:
+    pattern = re.compile(r"```python\n(.*?)```", re.DOTALL)
+    matches = pattern.findall(completion)
+    extracted_answer = matches[-1] if len(matches) >= 1 else ""
+    return extracted_answer
+
+
+##网路问题较多
+def code_reward(completions, **kwargs) -> list[float]:
+    """Reward function that evaluates code snippets using the E2B code interpreter.
+
+    Assumes the dataset contains a `verification_info` column with test cases.
+    """
+    if not is_e2b_available():
+        raise ImportError(
+            "E2B is not available and required for this reward function. Please install E2B with "
+            "`pip install e2b-code-interpreter` and add an API key to a `.env` file."
+        )
+
+    rewards = []
+    # TODO: add support for other languages in E2B: https://e2b.dev/docs/code-interpreting/supported-languages
+    try:
+        """Returns a reward function that evaluates code snippets in a sandbox."""
+        evaluation_script_template = """
+        import subprocess
+        import json
+
+        def evaluate_code(code, test_cases):
+            passed = 0
+            total = len(test_cases)
+            exec_timeout = 5
+
+            for case in test_cases:
+                process = subprocess.run(
+                    ["python3", "-c", code],
+                    input=case["input"],
+                    text=True,
+                    capture_output=True,
+                    timeout=exec_timeout
+                )
+
+                if process.returncode != 0:  # Error in execution
+                    continue
+
+                output = process.stdout.strip()
+                if output.strip() == case["output"].strip():
+                    passed += 1
+
+            success_rate = (passed / total)
+            return success_rate
+
+        code_snippet = {code}
+        test_cases = json.loads({test_cases})
+
+        evaluate_code(code_snippet, test_cases)
+        """
+        code_snippets = [extract_code(completion[-1]["content"]) for completion in completions]
+        verification_info = kwargs["verification_info"]
+        scripts = [
+            evaluation_script_template.format(
+                code=json.dumps(code), test_cases=json.dumps(json.dumps(info["test_cases"]))
+            )
+            for code, info in zip(code_snippets, verification_info)
+        ]
+        with Sandbox(timeout=30, request_timeout=3) as sbx:
+            for script in scripts:
+                execution = sbx.run_code(script, language=verification_info["language"])
+                try:
+                    output = float(execution.text)
+                except (TypeError, ValueError):
+                    output = 0.0
+                rewards.append(output)
+    except Exception as e:
+        print(f"Error from E2B executor: {e}")
+        rewards = [0.0] * len(completions)
+    return rewards
+
+def get_code_format_reward(language: str = "python"):
+    """Format reward function specifically for code responses.
+
+    Args:
+        language: Programming language supported by E2B https://e2b.dev/docs/code-interpreting/supported-languages
+    """
+    pattern = rf"^<think>.*?</think>\s*<answer>.*?```{language}\n.*?```.*?</answer>$"
+
+    def code_format_reward(completions, **kwargs):
+        completion_contents = [completion[0]["content"] for completion in completions]
+        matches = [re.match(pattern, content, re.DOTALL | re.MULTILINE) for content in completion_contents]
+        return [1.0 if match else 0.0 for match in matches]
+
+    return code_format_reward
+
+##大模型API来进行校核 比如GPT4 对于两个纯文本之间校核 可以使用embedding模型或者其他传统NLP计算相似度算法进行
+## FreedomIntelligence/medical-o1-verifiable-problem 参考X-R1项目
+# Initialize OpenAI client
+client = OpenAI(
+    api_key="",
+    base_url=""
+)
+def normalize_text(text):
+    """Normalize text by removing extra whitespace, converting to lowercase."""
+    if text is None:
+        return ""
+    # Remove extra whitespace and convert to lowercase
+    text = re.sub(r'\s+', ' ', text.strip().lower())
+    return text
+
+def extract_answer(text):
+    """Extract content between <answer> tags."""
+    if text is None:
+        return ""
+    match = re.search(r'<answer>(.*?)</answer>', text, re.DOTALL)
+    if match:
+        return match.group(1).strip()
+    return text.strip()
+
+def evaluate_answer_similarity(answer, solution):
+    """Use GPT4O-mini to evaluate answer similarity."""
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a medical answer evaluator. Compare the student's answer with the correct solution and output ONLY '1.0' if they match in meaning, or '0.0' if they don't match. No other output is allowed."
+                },
+                {
+                    "role": "user",
+                    "content": f"Student answer: {answer}\nCorrect solution: {solution}\nOutput only 1.0 or 0.0:"
+                }
+            ],
+            temperature=0
+        )
+        result = response.choices[0].message.content.strip()
+        return float(result)
+    except Exception as e:
+        print(f"Error in GPT evaluation: {e}")
+        # If API call fails, fall back to simple text matching
+        return 1.0 if normalize_text(answer) == normalize_text(solution) else 0.0

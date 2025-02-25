@@ -40,10 +40,10 @@ import os
 import sys
 
 import datasets
+import loguru
 import torch
 import transformers
-from datasets import load_dataset
-from transformers import AutoTokenizer, set_seed
+from transformers import set_seed
 from transformers.trainer_utils import get_last_checkpoint
 
 from trl import (
@@ -58,6 +58,8 @@ from trl import (
 
 from rl.config import SFTConfig
 from rl.utils.callbacks import get_callbacks
+from rl.utils.data_utils import dataset_format_alignment, load_or_prepare_datasets, local_data_to_datasets
+from rl.utils.model_utils import get_tokenizer
 from rl.utils.wandb_logging import init_wandb_training
 
 
@@ -83,11 +85,6 @@ def main(script_args, training_args, model_args):
     transformers.utils.logging.enable_default_handler()
     transformers.utils.logging.enable_explicit_format()
 
-    # Log on each process a small summary
-    logger.warning(
-        f"Process rank: {training_args.local_rank}, device: {training_args.device}, n_gpu: {training_args.n_gpu}"
-        + f" distributed training: {bool(training_args.local_rank != -1)}, 16-bits training: {training_args.fp16}"
-    )
     logger.info(f"Model parameters {model_args}")
     logger.info(f"Script parameters {script_args}")
     logger.info(f"Training parameters {training_args}")
@@ -105,14 +102,14 @@ def main(script_args, training_args, model_args):
     ################
     # Load datasets
     ################
-    dataset = load_dataset(script_args.dataset_name, name=script_args.dataset_config)
+    train_dataset,test_dataset = load_or_prepare_datasets(script_args=training_args)
+    loguru.logger.info(f"dataset size:{len(train_dataset)}")
+    loguru.logger.info(f"dataset example:{train_dataset[0]}")
 
     ################
     # Load tokenizer
     ################
-    tokenizer = AutoTokenizer.from_pretrained(
-        model_args.model_name_or_path, trust_remote_code=model_args.trust_remote_code, use_fast=True
-    )
+    tokenizer = get_tokenizer(model_args, training_args)
     tokenizer.pad_token = tokenizer.eos_token
 
     ###################
@@ -140,8 +137,8 @@ def main(script_args, training_args, model_args):
     trainer = SFTTrainer(
         model=model_args.model_name_or_path,
         args=training_args,
-        train_dataset=dataset[script_args.dataset_train_split],
-        eval_dataset=dataset[script_args.dataset_test_split] if training_args.eval_strategy != "no" else None,
+        train_dataset=train_dataset,
+        eval_dataset=test_dataset if training_args.eval_strategy != "no" else None,
         processing_class=tokenizer,
         peft_config=get_peft_config(model_args),
         callbacks=get_callbacks(training_args, model_args),
@@ -158,7 +155,7 @@ def main(script_args, training_args, model_args):
         checkpoint = last_checkpoint
     train_result = trainer.train(resume_from_checkpoint=checkpoint)
     metrics = train_result.metrics
-    metrics["train_samples"] = len(dataset[script_args.dataset_train_split])
+    metrics["train_samples"] = len(train_dataset)
     trainer.log_metrics("train", metrics)
     trainer.save_metrics("train", metrics)
     trainer.save_state()
@@ -187,16 +184,9 @@ def main(script_args, training_args, model_args):
     if training_args.do_eval:
         logger.info("*** Evaluate ***")
         metrics = trainer.evaluate()
-        metrics["eval_samples"] = len(dataset[script_args.dataset_test_split])
+        metrics["eval_samples"] =  len(test_dataset)
         trainer.log_metrics("eval", metrics)
         trainer.save_metrics("eval", metrics)
-
-    #############
-    # push to hub
-    #############
-    if training_args.push_to_hub:
-        logger.info("Pushing to hub...")
-        trainer.push_to_hub(**kwargs)
 
 
 if __name__ == "__main__":

@@ -81,6 +81,14 @@ class SFTConfig(trl.SFTConfig):
         default=None,
         metadata={"help": ("The project to store runs under.")},
     )
+    local_dataset_path: list[str]  = field(
+        default=None,
+        metadata={"help": ("The project to store runs under.")},
+    )
+    random_sample: Optional[str] = field(
+        default=None,
+        metadata={"help": ("The project to store runs under.")},
+    )
 
 @dataclass
 class GRPOScriptArguments(ScriptArguments):
@@ -136,4 +144,12 @@ class GRPOScriptArguments(ScriptArguments):
     repetition_max_penalty: float = field(
         default=-1.0,
         metadata={"help": "Maximum (negative) penalty for for repetition penalty reward"},
+    )
+    local_dataset_path: list[str]  = field(
+        default=None,
+        metadata={"help": ("The project to store runs under.")},
+    )
+    random_sample: Optional[str] = field(
+        default=None,
+        metadata={"help": ("The project to store runs under.")},
     )

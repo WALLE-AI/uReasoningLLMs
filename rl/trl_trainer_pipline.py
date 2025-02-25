@@ -1,25 +1,39 @@
 import os
 import sys
 from typing import List
-from datasets import load_dataset,Dataset
 import loguru
 from transformers import set_seed
-from dataclasses import dataclass, field
 import logging
-import json
 import transformers
 from rl.config import GRPOConfig, GRPOScriptArguments
-from rl.prompt import SYSTEM_PROMPT
-from rl.reward import accuracy_reward, format_reward, get_cosine_scaled_reward, get_repetition_penalty_reward, len_reward, reasoning_steps_reward
+from rl.reward import (
+    accuracy_reward,
+    code_reward,
+    format_reward,
+    format_reward_func,
+    get_code_format_reward,
+    get_cosine_scaled_reward,
+    get_repetition_penalty_reward,
+    int_reward_func,
+    len_reward,
+    reasoning_steps_reward,
+    reflection_reward_ratio,
+    simple_length_reward,
+    soft_format_reward_func,
+    strict_format_reward_func,
+    xmlcount_reward_func,
+)
 from rl.utils.callbacks import get_callbacks
+from rl.utils.data_utils import dataset_format_alignment, load_or_prepare_datasets, local_data_to_datasets
+from rl.utils.model_utils import get_tokenizer
 from rl.utils.wandb_logging import init_wandb_training
 from transformers.trainer_utils import get_last_checkpoint
-import pandas as pd
 import datasets
 import torch
 
 from trl import GRPOTrainer,ModelConfig, TrlParser,get_peft_config
 logger = logging.getLogger(__name__)
+
 
 class TrainerPipline():
     def __init__(self,script_args, training_args, model_args):
@@ -46,63 +60,20 @@ class TrainerPipline():
                 ngram_size=script_args.repetition_n_grams,
                 max_penalty=script_args.repetition_max_penalty,
             ),
-            "length": len_reward,
+            "len_reward": len_reward,
+            "soft_format_reward_func":soft_format_reward_func,
+            "strict_format_reward_func":strict_format_reward_func,
+            "int_reward_func":int_reward_func,
+            "xmlcount_reward_func":xmlcount_reward_func,
+            "format_reward_func":format_reward_func,
+            "reflection_reward_ratio":reflection_reward_ratio,
+            "simple_length_reward":simple_length_reward,
+            "code_reward":code_reward,
+            "get_code_format_reward":get_code_format_reward
+            
         }
         reward_funcs = [REWARD_FUNCS_REGISTRY[func] for func in script_args.reward_funcs]
         return reward_funcs
-
-    def local_data_to_datasets(self):
-        _, file_extension = os.path.splitext(script_args.local_dataset_path)
-        file_extension = file_extension.lower()
-        data_list =[]
-        if file_extension == ".json" or file_extension == ".jsonl":
-            with open(script_args.local_dataset_path,"r",encoding="utf-8") as file:
-                data_list = [data for data in json.loads(file.read())]
-        elif file_extension == ".parquet":
-            data_df = pd.read_parquet(script_args.local_dataset_path)
-            data_list = [data.to_dict() for index,data in data_df.iterrows()]
-        df = pd.DataFrame(data_list)
-        dataset = Dataset.from_pandas(df)
-        return dataset
-
-    
-    def load_or_prepare_datasets(self)->Dataset:
-        '''
-        本地加载和HF加载 local_path=script_args.local_dataset_path,
-                                                                  script_args=script_args.random_sample
-        '''
-        try:
-            if os.path.exists(script_args.local_dataset_path):
-                dataset = self.local_data_to_datasets()
-            else:
-                logger.info(f"from huggingface datastes download {script_args.dataset_name}")
-                dataset = load_dataset(script_args.dataset_name)
-            # split the dataset into train and test
-                # select a random subset of 50k samples
-            if script_args.random_sample:
-                dataset = dataset.shuffle(seed=42).select(range(script_args.random_sample))
-            train_test_split = dataset.train_test_split(test_size=0.1)
-            train_dataset = train_test_split["train"]
-            test_dataset = train_test_split["test"]
-            ##进行预处理
-            train_dataset= self._prepare_dataset(dataset=train_dataset)
-            test_dataset = self._prepare_dataset(dataset=test_dataset)
-            return train_dataset,test_dataset
-        except RuntimeError as e:
-            logger.info(f"load datsets error:{e}")
- 
-     # Format into conversation不同复现策略这里有点区别 都是数学题目
-    def make_conversation(self,example):
-        return {
-            "prompt": [
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": example["problem"]},
-            ],
-        }           
-
-    def _prepare_dataset(self,dataset:Dataset):
-        dataset = dataset.map(self.make_conversation)
-        return dataset 
 
     def _set_logging_info(self):
         ###############
@@ -149,8 +120,16 @@ class TrainerPipline():
 
         if "wandb" in self.training_args.report_to:
             init_wandb_training(self.training_args)
-        ##
-        train_datset,test_dataset = self.load_or_prepare_datasets()
+        
+        ## Load datasets
+        train_dataset,test_dataset = load_or_prepare_datasets(script_args=self.script_args)
+        loguru.logger.info(f"dataset size:{len(train_dataset)}")
+        loguru.logger.info(f"dataset example:{train_dataset[0]}")
+        
+        # Load tokenizer
+        ################
+        tokenizer = get_tokenizer(self.model_args, self.training_args)
+        tokenizer.pad_token = tokenizer.eos_token
 
         logger.info("*** Initializing model kwargs ***")
         torch_dtype = (
@@ -172,10 +151,11 @@ class TrainerPipline():
             model=self.model_args.model_name_or_path,
             reward_funcs=self.get_reward_func(),
             args=self.training_args,
-            train_dataset=train_datset,
+            train_dataset=train_dataset,
             eval_dataset=test_dataset if self.training_args.eval_strategy != "no" else None,
             peft_config=get_peft_config(self.model_args),
             callbacks=get_callbacks(self.training_args, self.model_args),
+            processing_class=tokenizer,
         )
         ###############
         # Training loop
@@ -184,11 +164,11 @@ class TrainerPipline():
         checkpoint = None
         if self.training_args.resume_from_checkpoint is not None:
             checkpoint = self.training_args.resume_from_checkpoint
-        elif last_checkpoint is not None:
+        if last_checkpoint is not None:
             checkpoint = last_checkpoint
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
         metrics = train_result.metrics
-        metrics["train_samples"] = len(train_datset)
+        metrics["train_samples"] = len(train_dataset)
         trainer.log_metrics("train", metrics)
         trainer.save_metrics("train", metrics)
         trainer.save_state()
