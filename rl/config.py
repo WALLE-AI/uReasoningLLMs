@@ -49,6 +49,19 @@ class GRPOConfig(trl.GRPOConfig):
         default=None,
         metadata={"help": ("The project to store runs under.")},
     )
+    use_vllm: Optional[bool] = field(
+        default=False,
+        metadata={"help": ("use vllm train.")},
+    )
+    model_type: Optional[str] = field(
+        default="llm",
+        metadata={"help": (" llm or vlm model type train")},
+    )
+    ##per_device_batch_size https://github.com/huggingface/trl/pull/2776
+   # per_device_train_batch_size = field(
+   #     default=3,
+   #     metadata={"help": "# reduce the batch size to reduce memory usage"},
+   # )
 
 
 @dataclass
@@ -152,4 +165,12 @@ class GRPOScriptArguments(ScriptArguments):
     random_sample: Optional[str] = field(
         default=None,
         metadata={"help": ("The project to store runs under.")},
+    )
+    max_pixels: Optional[int] = field(
+        default=12845056,
+        metadata={"help": "Maximum number of pixels for the image"},
+    )
+    min_pixels: Optional[int] = field(
+        default=3136,
+        metadata={"help": "Minimum number of pixels for the image"},
     )

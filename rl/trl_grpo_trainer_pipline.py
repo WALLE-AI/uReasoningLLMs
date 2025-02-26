@@ -5,6 +5,7 @@ import loguru
 from transformers import set_seed
 import logging
 import transformers
+from rl.backend.trl_vlm_vllm_grpo import Qwen2VLGRPOVLLMTrainer
 from rl.config import GRPOConfig, GRPOScriptArguments
 from rl.reward import (
     accuracy_reward,
@@ -149,16 +150,41 @@ class TrainerPipline():
         #############################
         # Initialize the GRPO trainer
         #############################
-        trainer = GRPOTrainer(
-            model=self.model_args.model_name_or_path,
-            reward_funcs=self.get_reward_func(),
-            args=self.training_args,
-            train_dataset=train_dataset,
-            eval_dataset=test_dataset if self.training_args.eval_strategy != "no" else None,
-            peft_config=get_peft_config(self.model_args),
-            callbacks=get_callbacks(self.training_args, self.model_args),
-            processing_class=tokenizer,
-        )
+        match self.training_args.model_type:
+            case "llm":
+                trainer = GRPOTrainer(
+                    model=self.model_args.model_name_or_path,
+                    reward_funcs=self.get_reward_func(),
+                    args=self.training_args,
+                    train_dataset=train_dataset,
+                    eval_dataset=test_dataset if self.training_args.eval_strategy != "no" else None,
+                    peft_config=get_peft_config(self.model_args),
+                    callbacks=get_callbacks(self.training_args, self.model_args),
+                    processing_class=tokenizer,
+                )
+            case "vlm":
+                ##多模态训练
+                trainer = Qwen2VLGRPOVLLMTrainer(
+                    model=self.model_args.model_name_or_path,
+                    reward_funcs=self.get_reward_vlm_func(),
+                    args=self.training_args,
+                    train_dataset=train_dataset,
+                    eval_dataset=test_dataset if self.training_args.eval_strategy != "no" else None,
+                    peft_config=get_peft_config(model_args),
+                    attn_implementation=self.model_args.attn_implementation,
+                    max_pixels=self.script_args.max_pixels,
+                    min_pixels=self.script_args.min_pixels,
+                )
+        # trainer = GRPOTrainer(
+        #     model=self.model_args.model_name_or_path,
+        #     reward_funcs=self.get_reward_func(),
+        #     args=self.training_args,
+        #     train_dataset=train_dataset,
+        #     eval_dataset=test_dataset if self.training_args.eval_strategy != "no" else None,
+        #     peft_config=get_peft_config(self.model_args),
+        #     callbacks=get_callbacks(self.training_args, self.model_args),
+        #     processing_class=tokenizer,
+        # )
         ###############
         # Training loop
         ###############
