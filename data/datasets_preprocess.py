@@ -269,3 +269,46 @@ def merge_datasets(file_paths, output_file=None, join_method='outer'):
     
     return merged_df
             
+            
+import json
+
+def extract_qa_from_md():
+    file_path = "xxxx/uReasoningLLMs/data/brain-teasers_zh/三千个脑筋急转弯.md"
+    """
+    从 .md 文件中提取脑筋急转弯的问题和答案，并返回包含字典的列表。
+    
+    参数:
+        file_path (str): .md 文件的路径
+    
+    返回:
+        list: 包含字典的列表，每个字典格式为 {"question": "xxxx", "answer": "xxx"}
+    """
+    # 读取文件内容
+    with open(file_path, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+    
+    # 存储问题和答案的列表
+    qa_list = []
+    
+    # 处理每一行
+    for line in lines:
+        # 只处理以 <br> 开头的行
+        if line.startswith('<br>'):
+            # 去掉 <br> 并移除首尾空白
+            line = line[4:].strip()
+            # 找到 — 的位置
+            dash_index = line.find('—')
+            if dash_index != -1:
+                # — 后面的是剩余内容
+                rest = line[dash_index + 1:].strip()
+                # 找到 答案： 的位置
+                answer_index = rest.find('答案：')
+                if answer_index != -1:
+                    # 提取问题和答案
+                    question = rest[:answer_index].strip()
+                    answer = rest[answer_index + 3:].strip()
+                    # 添加到列表
+                    qa_list.append({"question": question, "answer": answer})
+    save_data = "D:/LLM/project/dsr1/uReasoningLLMs/data/brain-teasers_zh/brain-teaser_zh_3649.jsonl"               
+    with open(save_data,"w",encoding="utf-8") as file:
+        file.write(json.dumps(qa_list,ensure_ascii=False,indent=4))
