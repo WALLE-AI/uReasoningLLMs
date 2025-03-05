@@ -58,6 +58,8 @@
 ### ORM(Outcome Reward Models)
 ### Progress of Replication Project
 * [Llama3.1_(8B)-GRPO](https://colab.research.google.com/github/unslothai/notebooks/blob/main/nb/Llama3.1_(8B)-GRPO.ipynb#scrollTo=XjjUb0hqE6nm)
+* [GRPO_From_Scratch_Multi_GPU_DataParallel_Qwen_2_5_1_5B_Instruct](https://github.com/aburkov/theLMbook/blob/main/GRPO_From_Scratch_Multi_GPU_DataParallel_Qwen_2_5_1_5B_Instruct.ipynb)
+* [Qwen2_5_(3B)_GRPO](https://github.com/matthewchung74/qwen_2_5_3B_GRPO_medical_thinking/blob/main/Qwen2_5_(3B)_GRPO.ipynb) reward 使用bert模型进行相似度打分
 * [Logic-RL](https://github.com/Unakar/Logic-RL) 
 * [open-r1](https://github.com/huggingface/open-r1)
 * [TinyZero](https://github.com/Jiayi-Pan/TinyZero)
@@ -78,6 +80,9 @@
 * [open-r1-multimodal](https://github.com/EvolvingLMMs-Lab/open-r1-multimodal)
 * [VLM-R1](https://github.com/om-ai-lab/VLM-R1) 在 open-r1-multimodal修改参数
 * [R1-V](https://github.com/Deep-Agent/R1-V)
+* [VisualThinker-R1-Zero](https://github.com/turningpoint-ai/VisualThinker-R1-Zero)
+* [R1-Multimodal-Journey](https://github.com/FanqingM/R1-Multimodal-Journey)
+* [Visual-RFT: Visual Reinforcement Fine-Tuning](https://github.com/Liuziyu77/Visual-RFT)
 ### Progress of Replication Domain Project
 * [diagnosis_zero](https://github.com/wizardlancet/diagnosis_zero) 在医疗的疾病诊断任务上拿Qwen2.5-1.5B/3B/7B用R1-Zero那种rule based reward尝试复现了一下
 * [PatientSeek](https://huggingface.co/whyhow-ai/PatientSeek)使用unsloth 单卡Int4上面基于DeepSeek-R1-Distill-Llama-8B微调作为的非常浅，但是业务场景思路很好
